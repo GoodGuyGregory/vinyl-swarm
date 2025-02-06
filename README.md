@@ -2,7 +2,7 @@
 
 A Common problem in collecting vinyl is that there is too much out there to find it all. The locations and places vinyl can be found are difficult to track down and having a swarm of friends can make this task less daunting. Add friends and share collections as you dig through crates. Check on their collections and share stock amongst others. 
 
-This Rust TUI (Terminal User Interface). will make this process easy to access. Hopefully you will finally snag those rarities you're after. Leverage several friends checking your wants and having an extra swarm looking through shops just for eachother.
+This Rust TUI (Terminal User Interface). will make this process easy to access. Hopefully you will finally snag those rarities you're after. Leverage several friends checking your wants and having an extra swarm looking through shops just for each other.
 
 
 
