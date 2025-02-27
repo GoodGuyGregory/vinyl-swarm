@@ -1,0 +1,8 @@
+/Users/gregwitt/Github/psu-rust-intro/oreilly-programming-rust-book/ch-18/request-sender/target/debug/deps/libfutures_task-5d3b458219bec4bf.rmeta: /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/lib.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/spawn.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/future_obj.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/noop_waker.rs
+
+/Users/gregwitt/Github/psu-rust-intro/oreilly-programming-rust-book/ch-18/request-sender/target/debug/deps/futures_task-5d3b458219bec4bf.d: /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/lib.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/spawn.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/future_obj.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/noop_waker.rs
+
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/lib.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/spawn.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/future_obj.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/futures-task-0.3.31/src/noop_waker.rs:
