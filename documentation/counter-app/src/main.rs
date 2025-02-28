@@ -20,6 +20,21 @@ pub struct App {
 
 impl App {
 
+    /// APP STATE METHODS:
+    /// better to define these here for unit testing 
+    fn exit(&mut self) {
+        self.exit = true;
+    }
+
+    fn increment_counter(&mut self) {
+        self.counter += 1;
+    }
+
+    fn decrement_counter(&mut self) {
+        self.counter -= 1;
+    }
+
+
     /// runs the application's main loop until the user quits
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
         while !self.exit {
@@ -30,8 +45,27 @@ impl App {
     }
 
 
+       /// updates the application's state based on user input
     fn handle_events(&mut self) -> io::Result<()> {
-        todo!()
+        match event::read()? {
+            // it's important to check that the event is a key press event as
+            // crossterm also emits key release and repeat events on Windows.
+            Event::Key(key_event) if key_event.kind == KeyEventKind::Press => {
+                self.handle_key_event(key_event)
+            }
+            _ => {}
+        };
+        Ok(())
+    }
+
+    // handles key change checking 
+    fn handle_key_event(&mut self, key_event: KeyEvent) {
+        match key_event.code {
+            KeyCode::Char('q') => self.exit(),
+            KeyCode::Left => self.decrement_counter(),
+            KeyCode::Right => self.increment_counter(),
+            _ => {}
+        }
     }
 
     fn draw(&self, frame: &mut Frame) {
@@ -75,7 +109,6 @@ fn main() -> io::Result<()> {
 }
 
 
-
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -104,5 +137,22 @@ mod tests {
         expected.set_style(Rect::new(43, 3, 4, 1), key_style);
 
         assert_eq!(buf, expected);
+    }
+
+    #[test]
+    fn handle_key_event() -> io::Result<()> {
+        let mut app = App::default();
+        app.handle_key_event(KeyCode::Right.into());
+        // ensure this action increases the app's counter by 1
+        assert_eq!(app.counter, 1);
+
+        app.handle_key_event(KeyCode::Left.into());
+        assert_eq!(app.counter, 0);
+
+        let mut app = App::default();
+        app.handle_key_event(KeyCode::Char('q').into());
+        assert!(app.exit);
+
+        Ok(())
     }
 }
