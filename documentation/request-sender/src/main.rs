@@ -1,6 +1,9 @@
 use std::collections::HashMap;
 use base64::{encode};
+use serde_json::Result;
 use serde::{Deserialize, Serialize};
+use dotenv::dotenv;
+use std::env;
 
 /// REQWEST Basic Tutorial Guide: 
 /// 
@@ -48,12 +51,36 @@ struct APIResponse {
     tracks: Items<Track>,
 }
 
-// tokio let's us use "async" on our main function
-#[tokio::main]
-async fn main() {
-    println!("Using reqwest in Rust");
+#[derive(serde::Serialize, serde::Deserialize)]
+struct TokenResponse {
+    access_token: String,
+    token_type: String,
+    expires_in: u32
+}
 
-    let _response  = reqwest::get("https://api.spotify.com/v1/search")
+#[derive(serde::Serialize, serde::Deserialize)]
+struct SpotifyClient {
+    client_id: String,
+    client_secret: String
+}
+
+fn gather_client_secrets() -> SpotifyClient {
+    dotenv().ok();
+
+    // Access the environment variables
+    let client_id = env::var("SPOTIFY_CLIENT_ID").expect("SPOTIFY_CLIENT_ID must be set");
+    let client_secret = env::var("SPOTIFY_CLIENT_SECRET").expect("SPOTIFY_CLIENT_SECRET must be set");
+
+    // build the ClientSecret
+    let client_secret = SpotifyClient {
+        client_id: client_id.to_owned(),
+        client_secret: client_secret.to_owned()
+    };
+    client_secret
+}
+
+async fn _generate_basic_spotify_request() {
+        let response  = reqwest::get("https://api.spotify.com/v1/search")
             .await
             // each response is wrapped in a `Result` type 
             // well unwrap here for simplicity
@@ -61,11 +88,12 @@ async fn main() {
             .text()
             .await;
 
-    // println!("Got {:?}", response);
+    println!("Got {:?}", response);
+}
 
-    // add a client to specify content-type accept and pass authorization headers
+async fn _generate_spotify_request_with_client() {
     let client = reqwest::Client::new();
-    let _client_resp = client
+    let client_resp = client
         .get("https://api.spotify.com/v1/search")
         // confirm the request using send
         .send()
@@ -75,10 +103,12 @@ async fn main() {
         .text()
         .await;
 
-    // println!("Client Response {:?}", client_resp);
+    println!("Client Response {:?}", client_resp);
+}
 
-    // finally authorization:
-
+/// get_spotify_authorization
+/// returns the authentication based on the client's secret
+async fn get_spotify_authorization(client_id: &str, client_secret: &str, ) -> std::result::Result<std::string::String, reqwest::Error>{
     // Spotify Access Token Documentation: 
     // https://developer.spotify.com/documentation/web-api/concepts/access-token
 
@@ -86,35 +116,64 @@ async fn main() {
     // https://developer.spotify.com/documentation/web-api/tutorials/client-credentials-flow
 
     // get the client credentials
-
-    // let mut params_body = HashMap::new();
+    let client = reqwest::Client::new();
+    let mut params_body = HashMap::new();
     // // add the body required
-    // params_body.insert("grant_type","client_credentials" ); 
+    params_body.insert("grant_type","client_credentials" ); 
 
     // create the base64 encoded string 
-    // let encoded_client_id_secret = encode("0cb3ce7b94834781a455de4869aba0d9:96c6fb28271c45bea2a0ff8fb2a28630");
-    // let basic_auth_encoded = format!("{} {}", "Basic ", encoded_client_id_secret);
+    let combined_client_credentials: String = format!("{}:{}", client_id, client_secret);
+    let encoded_client_id_secret = encode(&combined_client_credentials);
+    let basic_auth_encoded = format!("{} {}", "Basic ", encoded_client_id_secret);
 
-    // let bearer_token = client.post("https://accounts.spotify.com/api/token")
-    //     .header(AUTHORIZATION, &basic_auth_encoded )
-    //     .header(CONTENT_TYPE, "application/x-www-form-urlencoded")
-    //     .header(ACCEPT, "application/json")
-    //     .form(&params_body)
-    //     .send()
-    //     .await
-    //     .unwrap()
-    //     .text()
+    let bearer_token = client.post("https://accounts.spotify.com/api/token")
+        .header(AUTHORIZATION, &basic_auth_encoded )
+        .header(CONTENT_TYPE, "application/x-www-form-urlencoded")
+        .header(ACCEPT, "application/json")
+        .form(&params_body)
+        .send()
+        .await
+        .unwrap()
+        .text()
+        .await;
+
+    println!("Access Token: {:?}", bearer_token);
+    bearer_token
+}
+
+// tokio let's us use "async" on our main function
+#[tokio::main]
+async fn main() {
+    println!("Using reqwest in Rust");
+
+
+    let spotify_client = gather_client_secrets();
+
+    // make a basic request
+    // generate_basic_spotify_request()
     //     .await;
 
-    // println!("Access Token: {:?}", bearer_token);
-    let bearer_token = "Bearer BQDs8pD550-EzMjc2mFGkGpOZvA86XnHuSR1S1VGKXMp2NMawaEa3Legcui-6_L-7Jtnw1KbYnnyMr60rERWu7bt59PiwvfwqBd5_jkOaL6Wxv3p_gK_a22GMhjd_QTvBaGZZtvH1kA";
+    // add a client to specify content-type accept and pass authorization headers
+    // generate_spotify_request_with_client()
+    //     .await;
+
+    // finally authorization:
+    let resp_token = get_spotify_authorization(&spotify_client.client_id, &spotify_client.client_secret)
+                                    .await
+                                    .unwrap();
+
+                                // returns OK get the value from the serde_json
+    let bearer_token_json:TokenResponse = serde_json::from_str(&resp_token).unwrap();
+    
+    let bearer_token = format!("Bearer {access_token}", access_token=bearer_token_json.access_token);
+    println!("Token: {}", &bearer_token);
 
     let url = format!(
-        "https://api.spotify.com/v1/search?query={query}&type=artist&limit=5&market=US", query = "Khruangbin"
+        "https://api.spotify.com/v1/search?query={query}&type=artist&limit=5&market=US", query = "Khurangbin"
     );
 
     // reqwest crate: https://docs.rs/reqwest/0.11.5/reqwest/#making-post-requests-or-setting-request-bodies
-
+    let client = reqwest::Client::new();
     let authorized_resp = client
         .get(url)
         .header(AUTHORIZATION, bearer_token)
@@ -130,8 +189,48 @@ async fn main() {
     // hot garbage json. yuck...
     println!("{:?}", authorized_resp);
     
-    
-    
 
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    // add the async library 
+    use tokio::test;
+
+    #[test]
+    async fn test_can_access_credentials() {
+        dotenv().ok();
+
+          // Access the environment variables
+        let client_id = env::var("SPOTIFY_CLIENT_ID").expect("SPOTIFY_CLIENT_ID must be set");
+        let client_secret = env::var("SPOTIFY_CLIENT_SECRET").expect("SPOTIFY_CLIENT_SECRET must be set");
+        
+        let spotify_client = gather_client_secrets();
+
+        assert_eq!(spotify_client.client_id, client_id);
+        assert_eq!(spotify_client.client_secret, client_secret);
+    }
+
+    #[test]
+    async fn test_response_token_granted() {
+          // Access the environment variables
+        
+        let spotify_client = gather_client_secrets();
+        
+        let resp_token =  get_spotify_authorization(&spotify_client.client_id, &spotify_client.client_secret)
+                                    .await
+                                    .unwrap();
+
+                                // returns OK get the value from the serde_json
+        let bearer_token_json:TokenResponse = serde_json::from_str(&resp_token).unwrap();
+
+        // check the access_token 
+        assert!(bearer_token_json.access_token.len() > 0 );
+        // check token-type
+        assert_eq!(bearer_token_json.token_type, "Bearer");
+        // expires_in should be 3600
+        assert_eq!(bearer_token_json.expires_in, 3600);
+    }
 
 }
