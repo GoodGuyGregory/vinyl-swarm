@@ -1,0 +1,12 @@
+/Users/gregwitt/Github/vinyl-swarm/vinyl-swarm/target/debug/deps/libspki-2d3e8e2afe8ba2de.rmeta: /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/lib.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/algorithm.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/error.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/spki.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/traits.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/../README.md
+
+/Users/gregwitt/Github/vinyl-swarm/vinyl-swarm/target/debug/deps/libspki-2d3e8e2afe8ba2de.rlib: /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/lib.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/algorithm.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/error.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/spki.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/traits.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/../README.md
+
+/Users/gregwitt/Github/vinyl-swarm/vinyl-swarm/target/debug/deps/spki-2d3e8e2afe8ba2de.d: /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/lib.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/algorithm.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/error.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/spki.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/traits.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/../README.md
+
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/lib.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/algorithm.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/error.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/spki.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/traits.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/spki-0.7.3/src/../README.md:
