@@ -1,0 +1,11 @@
+/Users/gregwitt/Github/vinyl-swarm/vinyl-swarm/target/debug/deps/libeither-a65fe2c71ed81d1d.rmeta: /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/lib.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/serde_untagged.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/serde_untagged_optional.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/iterator.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/into_either.rs
+
+/Users/gregwitt/Github/vinyl-swarm/vinyl-swarm/target/debug/deps/libeither-a65fe2c71ed81d1d.rlib: /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/lib.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/serde_untagged.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/serde_untagged_optional.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/iterator.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/into_either.rs
+
+/Users/gregwitt/Github/vinyl-swarm/vinyl-swarm/target/debug/deps/either-a65fe2c71ed81d1d.d: /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/lib.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/serde_untagged.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/serde_untagged_optional.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/iterator.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/into_either.rs
+
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/lib.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/serde_untagged.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/serde_untagged_optional.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/iterator.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/either-1.14.0/src/into_either.rs:

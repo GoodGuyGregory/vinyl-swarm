@@ -1,0 +1,11 @@
+/Users/gregwitt/Github/vinyl-swarm/vinyl-swarm/target/debug/deps/libasync_task-0dbc2734d2b4106d.rmeta: /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/lib.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/header.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/raw.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/runnable.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/state.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/task.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/utils.rs
+
+/Users/gregwitt/Github/vinyl-swarm/vinyl-swarm/target/debug/deps/async_task-0dbc2734d2b4106d.d: /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/lib.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/header.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/raw.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/runnable.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/state.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/task.rs /Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/utils.rs
+
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/lib.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/header.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/raw.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/runnable.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/state.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/task.rs:
+/Users/gregwitt/.cargo/registry/src/index.crates.io-6f17d22bba15001f/async-task-4.7.1/src/utils.rs:
