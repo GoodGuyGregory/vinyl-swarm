@@ -1,0 +1,1 @@
+/Users/gregwitt/Github/vinyl-swarm/documentation/json-editor/target/debug/json-editor: /Users/gregwitt/Github/vinyl-swarm/documentation/json-editor/src/app.rs /Users/gregwitt/Github/vinyl-swarm/documentation/json-editor/src/main.rs /Users/gregwitt/Github/vinyl-swarm/documentation/json-editor/src/ui.rs
