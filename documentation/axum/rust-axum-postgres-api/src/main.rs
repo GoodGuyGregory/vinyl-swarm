@@ -1,26 +1,22 @@
-use axum::{response::IntoResponse, routing::get, Json, Router};
+
 use dotenv::dotenv;
 use sqlx::{postgres::PgPoolOptions, PgPool, Postgres, Pool};
 use std::env;
 use std::error::Error;
 use std::sync::Arc;
 
+use route::create_router;
+
+// add the modules
+mod handler;
+mod model;
+mod schema;
+mod route;
+
+
 
 pub struct AppState {
     db: Pool<Postgres>,
-}
-
-/// basic status check endpoint
-async fn status_check_handler() -> impl IntoResponse {
-    const MESSAGE: &str = "Simple CRUD API with Rust, SQLX, Postgres, and Axum";
-
-    let json_response = serde_json::json!({
-        "status": "Success",
-        "message": MESSAGE
-    });
-
-    // return the response
-    Json(json_response)
 }
 
 
@@ -45,9 +41,12 @@ async fn main() {
 
     match connect_to_database().await {
         Ok(pool) => {
+            // init the app state
             let app_state = Arc::new(AppState { db: pool.clone() });
               // create the app
-            let app = Router::new().route("/api/status", get(status_check_handler));
+            
+            // enable cors and the router for our app.
+            let app = create_router(app_state);
             
             println!("🛸 Server started successfully");
 
