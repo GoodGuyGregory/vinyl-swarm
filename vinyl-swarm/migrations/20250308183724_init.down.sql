@@ -12,6 +12,8 @@ DROP TABLE IF EXISTS record_stores;
 -- delete the user_record_stores table 
 DROP TABLE IF EXISTS user_record_stores;
 
--- delte the user_records table
+-- delete the user_records table
 DROP TABLE IF EXISTS user_records;
 
+-- delete the user_wishlist table
+DROP TABLE IF EXISTS user_wishlist;
