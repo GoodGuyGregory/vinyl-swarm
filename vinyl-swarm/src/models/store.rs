@@ -1,5 +1,5 @@
 use serde::{Serialize, Deserialize};
-use uuid:Uuid;
+use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RecordStore {
