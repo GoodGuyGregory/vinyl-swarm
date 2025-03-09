@@ -11,6 +11,7 @@ use axum::{
 use crate::{
     AppState,
     routes::records::list_all_records,
+    routes::record_stores::list_all_stores,
 };
 
 pub async fn status_handler() -> impl IntoResponse {
@@ -31,7 +32,8 @@ pub fn create_router(app_state: Arc<AppState>) -> Router {
     let api_routes = Router::new()
     // status route
         .route("/status", get(status_handler))
-        .route("/records", get(list_all_records));
+        .route("/records", get(list_all_records))
+        .route("/stores", get(list_all_stores));
 
     // return the router
     Router::new()

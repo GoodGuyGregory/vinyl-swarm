@@ -54,3 +54,22 @@ pub async fn list_all_records(
     }
 
 }
+
+/// POST add another record:
+/// uses the user's id to insert a record and add's it to the user's
+/// collection.
+/// params: user_id, body: contains record struct
+pub async fn create_new_record() {
+
+
+}
+
+// DELETE specific record by id
+pub async fn remove_record_by_id() {
+
+}
+
+// DELETE all records 
+pub async fn remove_all_records() {
+
+}
