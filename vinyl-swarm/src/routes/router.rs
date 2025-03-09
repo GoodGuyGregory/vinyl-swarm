@@ -1,13 +1,17 @@
 use std::sync::Arc;
 use axum::{
-    routing::{get},
+    routing::get,
     Router,
     Json,
     response::IntoResponse,
 };
 
+
 // internal modules 
-use crate::AppState;
+use crate::{
+    AppState,
+    routes::records::list_all_records,
+};
 
 pub async fn status_handler() -> impl IntoResponse {
     let message_status: &str = "vinyl swarm running: 👽 ";
@@ -26,7 +30,8 @@ pub fn create_router(app_state: Arc<AppState>) -> Router {
     // create the router for all CRUD endpoints
     let api_routes = Router::new()
     // status route
-        .route("/status", get(status_handler));
+        .route("/status", get(status_handler))
+        .route("/records", get(list_all_records));
 
     // return the router
     Router::new()
