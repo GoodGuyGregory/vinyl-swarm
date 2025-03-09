@@ -1,4 +1,4 @@
-use chrono::{NaiveDate, NaiveTime};
+use chrono::NaiveDateTime;
 use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
@@ -10,5 +10,5 @@ pub struct UserModel {
     pub user_first_name: String,
     pub user_email: String,
     pub user_password: String,
-    pub created_at: NaiveTime,
+    pub created_at: NaiveDateTime,
 }

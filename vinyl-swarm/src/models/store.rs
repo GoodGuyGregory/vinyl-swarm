@@ -9,6 +9,6 @@ pub struct RecordStore {
     pub store_city: String,
     pub store_state: String,
     pub store_zip: String,
-    pub phone_number: String,
-    pub website: String,
+    pub phone_number: Option<String>,
+    pub website: Option<String>,
 }
