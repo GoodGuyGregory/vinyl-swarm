@@ -1,10 +1,13 @@
-use axum::{response::IntoResponse, routing::get, Json, Router};
+use axum::{response::IntoResponse, Json};
 use tokio::net::TcpListener;
 use sqlx::{postgres::PgPoolOptions, PgPool, Postgres, Pool};
 use dotenv::dotenv;
 use std::env;
 use std::error::Error;
 use std::sync::Arc;
+
+// import routes module
+use routes::create_router;
 
 pub struct AppState {
     db: Pool<Postgres>,
@@ -45,7 +48,7 @@ async fn main() {
         Ok(pool) => {
             let app_state = Arc::new(AppState { db: pool.clone() });
               // create the app
-            let app = Router::new().route("/api/status", get(status_handler));
+            let app = create_router(app_state);
             
             println!("🛸 Server started successfully");
 
