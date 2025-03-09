@@ -9,7 +9,7 @@ use crate::{
     AppState,
     routes::records::list_all_records,
     routes::record_stores::list_all_stores,
-    routes::users::{list_all_users, find_specific_user, create_user},
+    routes::users::{list_all_users, find_specific_user, create_user, edit_user},
 };
 
 
@@ -36,7 +36,8 @@ pub fn create_router(app_state: Arc<AppState>) -> Router {
         .route("/users", 
         get(list_all_users)
                     .post(create_user))
-        .route("/users/{user_name}", get(find_specific_user));
+        .route("/users/{id}", get(find_specific_user)
+                            .patch(edit_user));
 
     // return the router
     Router::new()
