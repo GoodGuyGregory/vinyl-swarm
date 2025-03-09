@@ -1,5 +1,5 @@
-use chrono::{NaiveDate, NaiveTime},
-use serde::{Serialize, Deserialize},
+use chrono::{NaiveDate, NaiveTime};
+use serde::{Serialize, Deserialize};
 use uuid::Uuid;
 
 #[derive(Debug, Serialize, Deserialize)]
