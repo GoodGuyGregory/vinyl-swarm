@@ -148,9 +148,6 @@ pub async fn create_user(State(data): State<Arc<AppState>>, Json(body): Json<Cre
     }
 }
 
-pub async fn delete_user() {}
-
-
 pub async fn edit_user(
     Path(id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
@@ -198,7 +195,7 @@ pub async fn edit_user(
                 "user": converted_user
             });
             
-            return Ok(Json(user_response));
+            return Ok((StatusCode::OK, Json(user_response)));
         }
         Err(err) => {
             return Err((StatusCode::INTERNAL_SERVER_ERROR,
@@ -206,4 +203,33 @@ pub async fn edit_user(
             ));
         }
     }
+}
+
+
+/// delete_user:
+/// DELETE for removing the user_id supplied for the user
+/// the service intends to delete
+pub async fn delete_user(
+    Path(id): Path<Uuid>,
+    State(data): State<Arc<AppState>>,
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+
+    let delete_query = sqlx::query!("DELETE FROM users WHERE user_id = $1", id)
+        .execute(&data.db)
+        .await
+        .unwrap()
+        .rows_affected();
+
+    if delete_query == 0 {
+        let error_reponse = serde_json::json!(
+            {
+                "status": "fail",
+                "message": format!("user id: {} not found", id)
+            }
+        );
+        return Err((StatusCode::NOT_FOUND, Json(error_reponse)));
+    }
+
+    // assume something disappeared
+    Ok(StatusCode::NO_CONTENT)
 }
