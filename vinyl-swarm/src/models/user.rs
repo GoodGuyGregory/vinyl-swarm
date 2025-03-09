@@ -10,6 +10,13 @@ pub struct FilterOptions {
     pub limit: Option<usize>,
 }
 
+
+// used to search for a single username
+#[derive(Deserialize, Debug)]
+pub struct ParamOptions {
+    pub user_name: String,
+}
+
 // due to security concerns
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserResponseSchema {
@@ -18,6 +25,15 @@ pub struct UserResponseSchema {
     pub user_last_name: String,
     pub user_email: String,
     pub created_at: Option<DateTime<Utc>>,
+}
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct CreateUserSchema {
+    pub user_name: String,
+    pub user_first_name: String,
+    pub user_last_name: String,
+    pub user_email: String,
+    pub user_password: String,
 }
 
 // helps for converting to the appropriate exposed 
