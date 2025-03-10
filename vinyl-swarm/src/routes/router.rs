@@ -11,10 +11,9 @@ use axum::{
 use crate::{
     AppState,
     routes::records::list_all_records,
-    routes::record_stores::{list_all_stores, create_record_store},
+    routes::record_stores::{list_all_stores, create_record_store, edit_record_store, find_record_store, delete_record_store},
     routes::users::{list_all_users, find_specific_user, create_user, edit_user, delete_user},
 };
-
 
 pub async fn status_handler() -> impl IntoResponse {
     let message_status: &str = "vinyl swarm running: 👽 ";
@@ -37,6 +36,10 @@ pub fn create_router(app_state: Arc<AppState>) -> Router {
         .route("/records", get(list_all_records))
         .route("/stores", get(list_all_stores)
                                             .post(create_record_store))
+        .route("/stores/{id}",    
+                            get(find_record_store)
+                                        .patch(edit_record_store)
+                                        .delete(delete_record_store))
         .route("/users", 
         get(list_all_users)
                     .post(create_user))
