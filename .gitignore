@@ -4,3 +4,6 @@ documentation/sqlx/bookstore/.env
 documentation/sqlx/bookstore/target/*
 documentation/axum/rust-axum-postres-api/.env
 documentation/axum/rust-axum-postres-api/target
+
+documentation/axum/rust-axum-postres-api/.env
+vinyl-swarm/target/*
