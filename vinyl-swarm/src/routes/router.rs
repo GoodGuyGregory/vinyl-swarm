@@ -1,6 +1,9 @@
 use std::sync::Arc;
 use axum::{
-    response::IntoResponse, routing::{get, post}, Json, Router
+    response::IntoResponse, 
+    routing::{get, patch}, 
+    Json, 
+    Router
 };
 
 
@@ -8,8 +11,8 @@ use axum::{
 use crate::{
     AppState,
     routes::records::list_all_records,
-    routes::record_stores::list_all_stores,
-    routes::users::{list_all_users, find_specific_user, create_user, edit_user},
+    routes::record_stores::{list_all_stores, create_record_store},
+    routes::users::{list_all_users, find_specific_user, create_user, edit_user, delete_user},
 };
 
 
@@ -32,12 +35,14 @@ pub fn create_router(app_state: Arc<AppState>) -> Router {
     // status route
         .route("/status", get(status_handler))
         .route("/records", get(list_all_records))
-        .route("/stores", get(list_all_stores))
+        .route("/stores", get(list_all_stores)
+                                            .post(create_record_store))
         .route("/users", 
         get(list_all_users)
                     .post(create_user))
         .route("/users/{id}", get(find_specific_user)
-                            .patch(edit_user));
+                            .patch(edit_user)
+                        .delete(delete_user));
 
     // return the router
     Router::new()
