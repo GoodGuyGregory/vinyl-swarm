@@ -11,14 +11,19 @@ use axum::{
 use serde_json::json;
 use uuid::Uuid;
 
-use crate::{models::user, AppState};
-use crate::{models::user::{
-    FilterOptions, 
-    UserModel, 
-    UserResponseSchema,
-    UpdateUserSchema,
-    CreateUserSchema,
-}};
+use crate::AppState;
+use crate::{
+    models::user::{
+        FilterOptions, 
+        UserModel, 
+        UserResponseSchema,
+        UpdateUserSchema,
+        CreateUserSchema,
+    },
+    models::record::{
+        RecordModel,
+    }
+};
 
 pub async fn list_all_users(
     Query(opts): Query<FilterOptions>,
@@ -133,7 +138,7 @@ pub async fn create_user(State(data): State<Arc<AppState>>, Json(body): Json<Cre
                 let error_response = serde_json::json!(
                     {
                         "status": "fail",
-                        "messsage": "Note with that title already exists",
+                        "message": format!("user_name {} already exists", body.user_name),
                     }
                 );
                 return Err((StatusCode::CONFLICT, Json(error_response)));
@@ -204,6 +209,87 @@ pub async fn edit_user(
         }
     }
 }
+
+
+/// get_user_records
+/// returns all user records associated with a specific user id provided
+/// get_user_records
+/// returns all user records associated with a specific user id provided
+pub async fn get_user_records(
+    Path(user_id): Path<Uuid>,
+    State(data): State<Arc<AppState>>
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)>
+{
+    // query the db
+    let user_records_query: Vec<Uuid> = sqlx::query!("SELECT record_id FROM user_records WHERE user_id = $1", user_id)
+        .fetch_all(&data.db)
+        .await
+        .unwrap()
+        //iterate over the returned record ids
+        .into_iter()
+        .map(|row| row.record_id)
+        .collect();
+
+    // show something to to client
+    if user_records_query.is_empty() {
+        return Ok(StatusCode::OK.into_response());
+    }
+
+    // query for those sweet tunes you've collected
+    let record_query = sqlx::query_as!(
+            RecordModel,
+            "SELECT * FROM records WHERE record_id = ANY($1)",
+            &user_records_query,
+        )
+        .fetch_all(&data.db)
+        .await;
+
+    match record_query {
+        Ok(user_records) => {
+            let user_records_response = json!({
+                "status": "success",
+                "results": user_records.len(),
+                "user_records": user_records,
+            });
+            return Ok(Json(user_records_response).into_response());
+        }
+        Err(_) => {
+            let error_response = json!({
+                "status": "fail",
+                "message": format!("no user_records found for user id: {}", user_id)
+            });
+            return Err((StatusCode::NOT_FOUND, Json(error_response)));
+        }
+    }
+}
+
+// pub async fn create_user_records() {
+
+// }
+
+
+// DELETE all user records 
+pub async fn remove_all_user_records(
+    Path(id): Path<Uuid>,
+    State(data): State<Arc<AppState>>,
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    
+    let rows_affected = sqlx::query!("DELETE FROM user_records WHERE user_id = $1", id)
+        .execute(&data.db)
+        .await
+        .unwrap()
+        .rows_affected();
+
+    if rows_affected == 0 {
+        let error_response = serde_json::json!({
+            "status": "fail",
+            "message": format!("no records found for user id: {}", id)
+        });
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
+    }
+
+    Ok(StatusCode::NO_CONTENT) // Make sure this is inside the function and properly closed
+} 
 
 
 /// delete_user:
