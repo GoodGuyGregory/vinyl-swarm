@@ -1,12 +1,13 @@
 use std::sync::Arc;
 
 use axum::{
-    body, extract::{Query, State}, http::StatusCode, response::IntoResponse, Json
+    body, extract::{Path, Query, State}, http::StatusCode, response::IntoResponse, Json
 };
 use chrono::offset;
 use serde_json::json;
+use uuid::Uuid;
 use crate::AppState;
-use crate::models::store::{RecordStoreModel, FilterOptions, CreateRecordStoreSchema};
+use crate::models::store::{RecordStoreModel, FilterOptions, UpdateRecordStoreSchema, CreateRecordStoreSchema};
 
 
 /// GET all record stores from the database
@@ -92,3 +93,125 @@ pub async fn create_record_store(
     }
 
 }
+
+pub async fn find_record_store(
+    Path(id): Path<Uuid>, 
+    State(data): State<Arc<AppState>>
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+
+    // get the record store assuming it's a valid uuid
+    let query_result = sqlx::query_as!(
+        RecordStoreModel, "SELECT * FROM record_stores WHERE record_store_id = $1",id)
+        .fetch_one(&data.db)
+        .await;
+
+    // match for error from the Result
+    match query_result {
+        Ok(record_store) => {
+            let record_store_resp = serde_json::json!(
+                {
+                    "status": "success",
+                    "record_store": record_store
+                });
+
+            return Ok(Json(record_store_resp));
+        }
+        Err(_) => {
+            let error_response = serde_json::json!(
+                {
+                    "status": "fail",
+                    "message": format!("record_store_id {} not found", id)
+                });
+
+            return Err((StatusCode::NOT_FOUND, Json(error_response)));
+        }
+    }
+}
+
+pub async fn edit_record_store(
+    Path(id): Path<Uuid>,
+    State(data): State<Arc<AppState>>,
+    Json(body): Json<UpdateRecordStoreSchema>
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    
+    let query_result = sqlx::query_as!(
+        RecordStoreModel,
+        "SELECT * FROM record_stores WHERE record_store_id = $1", id)
+        .fetch_one(&data.db)
+        .await;
+    
+    if query_result.is_err() {
+        let error_response = serde_json::json!(
+            {
+                "status": "fail",
+                "message": format!("record store id: {} not found", id)
+            });
+
+            return  Err((StatusCode::NOT_FOUND, Json(error_response)));
+    }
+
+    let record_store = query_result.unwrap();
+
+    // modify the record store at the provided id
+
+    let query_result = sqlx::query_as!(
+            RecordStoreModel,
+            "UPDATE record_stores SET store_name = $1, store_address = $2, store_city = $3, store_state = $4, 
+            store_zip = $5, phone_number = $6, website = $7 WHERE record_store_id = $8 RETURNING *", 
+            body.store_name.to_owned().unwrap_or(record_store.store_name),
+            body.store_address.to_owned().unwrap_or(record_store.store_address),
+            body.store_city.to_owned().unwrap_or(record_store.store_city),
+            body.store_state.to_owned().unwrap_or(record_store.store_state),
+            body.store_zip.to_owned().unwrap_or(record_store.store_zip),
+            body.phone_number.to_owned().unwrap_or(record_store.phone_number.unwrap()),
+            body.website.to_owned().unwrap_or(record_store.website.unwrap()),
+            id,
+        )
+        .fetch_one(&data.db)
+        .await;
+
+    match query_result {
+        // no errors -> respond with the record store
+        Ok(record_store) => {
+            let record_store_response = serde_json::json!(
+                {
+                    "status": "success",
+                    "record_store": record_store
+                });
+
+            return  Ok((StatusCode::OK, Json(record_store_response)));
+        }
+
+        Err(err) => {
+            return Err((StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"status": "error", "message": format!("{:?}", err)})),
+            ));
+        }
+    }
+
+}
+
+pub async fn delete_record_store(
+    Path(id): Path<Uuid>,
+    State(data): State<Arc<AppState>>,
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+
+    let delete_query = sqlx::query!("DELETE FROM record_stores WHERE record_store_id = $1", id)
+        .execute(&data.db)
+        .await
+        .unwrap()
+        .rows_affected();
+
+    if delete_query == 0 {
+        let error_response = serde_json::json!(
+            {
+                "status": "fail",
+                "message": format!("record store id: {} not found", id)
+            }
+        );
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
+    }
+
+    // assume it successfully deleted the record_store requested
+    Ok(StatusCode::NO_CONTENT)
+} 
