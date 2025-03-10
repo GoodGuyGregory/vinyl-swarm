@@ -9,7 +9,6 @@ pub struct FilterOptions {
     pub limit: Option<usize>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CreateRecordSchema {
     pub artist: String,
