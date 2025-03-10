@@ -11,4 +11,4 @@ target/
 *.d
 *.o
 *.rcgu.o
-
+vinyl-swarm/target/debug/*
