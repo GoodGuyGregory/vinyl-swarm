@@ -16,6 +16,8 @@ use crate::{
         list_all_records, find_record, create_new_record, edit_record, delete_record_by_id
     },
     routes::record_stores::{
+        // user_record_stores:
+        get_user_record_stores, add_existing_record_store, add_user_record_store, delete_user_record_store,
         list_all_stores, create_record_store, edit_record_store, find_record_store, delete_record_store},
     routes::users::{
         list_all_users, find_specific_user, create_user, edit_user, delete_user, 
@@ -66,10 +68,11 @@ pub fn create_router(app_state: Arc<AppState>) -> Router {
                                                     .post(add_to_user_wishlist)
                                                 .put(put_wishlist_record)
                                             .delete(remove_user_wishlist )
-                                        .patch(remove_wishlist_record));
-        // .route("/record_stores/{user_id}", get(get_user_record_stores)
-        //                                                     .post(add_user_record_store)
-        //                                                     .delete(delete_user_record_store));
+                                        .patch(remove_wishlist_record))
+        .route("/record_stores/{user_id}", get(get_user_record_stores)
+                                                            .post(add_user_record_store)
+                                                            .put(add_existing_record_store)
+                                                            .delete(delete_user_record_store));
 
     // return the router
     Router::new()

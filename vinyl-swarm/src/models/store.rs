@@ -21,6 +21,18 @@ pub struct CreateRecordStoreSchema {
 }
 
 #[derive(Serialize, Deserialize, Debug)]
+pub struct PutRecordStoreSchema {
+    pub record_store_id: Uuid,
+}
+
+
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PatchRecordStoreSchema {
+    pub record_store_id: Uuid,
+}
+
+
+#[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateRecordStoreSchema {
     pub store_name: Option<String>,
     pub store_address: Option<String>,
