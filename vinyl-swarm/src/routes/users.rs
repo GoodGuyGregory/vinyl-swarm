@@ -1,11 +1,8 @@
 use std::sync::Arc;
 use bcrypt::{DEFAULT_COST, hash};
-
+use bigdecimal::BigDecimal;
 use axum::{
-    http::StatusCode,
-    extract::{Path, Query, State},
-    response::IntoResponse,
-    Json,
+    body::Body, extract::{Path, Query, State}, http::StatusCode, response::IntoResponse, Json
 };
 
 use serde_json::json;
@@ -19,10 +16,13 @@ use crate::{
         UserResponseSchema,
         UpdateUserSchema,
         CreateUserSchema,
+        PutUserRecord,
     },
     models::record::{
         RecordModel,
-    }
+        CreateRecordSchema,
+    },
+    routes::records::combine_supplied_genres,
 };
 
 pub async fn list_all_users(
@@ -263,12 +263,184 @@ pub async fn get_user_records(
     }
 }
 
-// pub async fn create_user_records() {
+/// create_user_records:
+/// arguments:
+/// * user_id: user_id associated with the new record to add 
+/// * State of the application: AppState
+/// * record to insert : JSON
+pub async fn create_user_record(
+    Path(user_id): Path<Uuid>,
+    State(data): State<Arc<AppState>>,
+    Json(body): Json<CreateRecordSchema>
+) -> impl IntoResponse {
 
-// }
+    //query for the user if they even exist...
+    let user_query_check = sqlx::query_as!(
+        UserModel,
+        "SELECT * FROM users WHERE user_id = $1",
+        user_id
+    )
+    .fetch_one(&data.db)
+    .await;
+
+    // ensure the user exists 
+    match user_query_check {
+        // yay! found a user! let's add some sweet music
+        Ok(found_user) => {
+            // query for the new record insertion
+            let create_record_result = sqlx::query_as!(
+                RecordModel,
+                "INSERT INTO records (artist, title, released, genre, format, price, label, duration_length)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+                body.artist,
+                body.title,
+                body.released,
+                &combine_supplied_genres(body.genre),
+                // unwrap if not supplied
+                body.format.as_deref().unwrap_or("LP"),
+                // if not supplied create empty value
+                body.price.unwrap_or(BigDecimal::from(0)),
+                body.label,
+                body.duration_length
+            )
+            .fetch_one(&data.db)
+            .await;
+
+            // hopefully I get a record model back.
+
+            match create_record_result {
+                Ok(created_record) => {
+                    // add this to the user_records table by associated user_id
+                    let user_records_insert_query = sqlx::query!(
+                        "INSERT INTO user_records ( user_id, record_id) VALUES ($1, $2) RETURNING user_record_id, user_id, record_id",
+                        found_user.user_id,
+                        created_record.record_id,
+                    )
+                    .fetch_one(&data.db)
+                    .await;
+
+                    match user_records_insert_query {
+                        Ok(created_user_record) => {
+                            let create_user_record_resp = serde_json::json!({
+                                "status": "success",
+                                "records_collected": "1",
+                                "user_id": created_user_record.user_id,
+                                "user_record_id": created_user_record.user_record_id,
+                                "record": created_record,
+                            });
+                            (StatusCode::OK, Json(create_user_record_resp))
+                        },
+                        Err(e) => {
+                            let error_response = serde_json::json!({
+                                "status": "fail",
+                                "message": format!("error when collecting records for user_id: {}, {}", user_id, e),
+                            });
+                            (StatusCode::INTERNAL_SERVER_ERROR, Json(error_response))
+                        }
+                    }
+                }
+                // something went wrongo
+                Err(e) => {
+                    (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({"status": "error", "message": format!("{:?}", e)})))
+                }
+            }
+        }
+        // assume not an valid uuid
+        Err(_) => {
+            let error_response = serde_json::json!(
+                {
+                    "status": "fail",
+                    "message": format!("user_id {} not found", user_id)
+                });
+            
+            return (StatusCode::NOT_FOUND, Json(error_response));
+        }
+    }
+
+}
 
 
-// DELETE all user records 
+pub async fn put_user_record(
+    Path(user_id): Path<Uuid>,
+    State(data): State<Arc<AppState>>,
+    Json(body): Json<PutUserRecord>
+) -> impl IntoResponse {
+
+    //query for the user if they even exist...
+    let user_query_check = sqlx::query_as!(
+        UserModel,
+        "SELECT * FROM users WHERE user_id = $1",
+        user_id
+    )
+    .fetch_one(&data.db)
+    .await;
+
+    // ensure the user exists 
+    match user_query_check {
+        // yay! found a user! let's add some sweet music
+        Ok(found_user) => {
+            // query for the existing record
+            let query_record_result = sqlx::query_as!(
+                RecordModel,
+                "SELECT * FROM records WHERE record_id = $1",
+                body.record_id,
+            )
+            .fetch_one(&data.db)
+            .await;
+
+            // hopefully I get a record model back.
+
+            match query_record_result {
+                Ok(created_record) => {
+                    // add this to the user_records table by associated user_id
+                    let user_records_insert_query = sqlx::query!(
+
+                        "INSERT INTO user_records ( user_id, record_id) VALUES ($1, $2) RETURNING user_record_id, user_id, record_id",
+                        found_user.user_id,
+                        created_record.record_id,
+                    )
+                    .fetch_one(&data.db)
+                    .await;
+
+                    match user_records_insert_query {
+                        Ok(created_user_record) => {
+                            let create_user_record_resp = serde_json::json!({
+                                "status": "success",
+                                "records_collected": "1",
+                                "user_id": created_user_record.user_id,
+                                "user_record_id": created_user_record.user_record_id,
+                                "record": created_record,
+                            });
+                            (StatusCode::OK, Json(create_user_record_resp))
+                        },
+                        Err(e) => {
+                            let error_response = serde_json::json!({
+                                "status": "fail",
+                                "message": format!("error when collecting records for user_id: {}, {}", user_id, e),
+                            });
+                            (StatusCode::INTERNAL_SERVER_ERROR, Json(error_response))
+                        }
+                    }
+                }
+                Err(_) => {
+                    (StatusCode::NOT_FOUND, Json(json!({"status": "error", "message": format!("record_id: {} not found", body.record_id)})))
+                }
+            }
+        }
+        // assume not an valid uuid
+        Err(_) => {
+            let error_response = serde_json::json!(
+                {
+                    "status": "fail",
+                    "message": format!("record {} not found", body.record_id)
+                });
+            
+            return (StatusCode::NOT_FOUND, Json(error_response));
+        }
+    }
+
+}
+
 pub async fn remove_all_user_records(
     Path(id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
@@ -289,6 +461,62 @@ pub async fn remove_all_user_records(
     }
 
     Ok(StatusCode::NO_CONTENT) // Make sure this is inside the function and properly closed
+} 
+
+// DELETE all user records 
+pub async fn remove_user_records(
+    Path(user_id): Path<Uuid>,
+    Path(record_id): Path<Uuid>,
+    State(data): State<Arc<AppState>>,
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+
+    let user_check = sqlx::query!("SELECT user_id FROM users WHERE user_id = $1", user_id)
+        .fetch_optional(&data.db)
+        .await
+        .unwrap();
+
+    // checking to ensure it's not a false user
+    if user_check.is_none() {
+        let error_response = serde_json::json!({
+            "status": "fail",
+            "message": format!("User with id {} not found", user_id)
+        });
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
+    }
+
+    // Query for the record
+    let record_check = sqlx::query!("SELECT record_id FROM records WHERE record_id = $1", record_id)
+        .fetch_optional(&data.db)
+        .await
+        .unwrap();
+
+    if record_check.is_none() {
+        let error_response = serde_json::json!({
+            "status": "fail",
+            "message": format!("Record with id {} not found", record_id)
+        });
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
+    }
+
+    let rows_affected = sqlx::query!(
+        "DELETE FROM user_records WHERE user_id = $1 AND record_id = $2",
+        user_id, 
+        record_id
+    )
+    .execute(&data.db)
+    .await
+    .unwrap()
+    .rows_affected();
+
+    if rows_affected == 0 {
+        let error_response = serde_json::json!({
+            "status": "fail",
+            "message": format!("No user_records found for user_id: {} and record_id: {}", user_id, record_id)
+        });
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
+    }
+
+    Ok(StatusCode::NO_CONTENT)
 } 
 
 
