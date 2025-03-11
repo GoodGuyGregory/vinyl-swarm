@@ -16,6 +16,12 @@ pub struct PutUserRecord {
     pub record_id: Uuid
 }
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PatchUserRecord {
+    pub record_id: Uuid
+}
+
+
 
 // due to security concerns
 #[derive(Serialize, Deserialize, Debug)]
