@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use axum::{
     response::IntoResponse, 
-    routing::{get, delete},
+    routing::{get},
     Json, 
     Router
 };
@@ -10,11 +10,16 @@ use axum::{
 // internal modules 
 use crate::{
     AppState,
-    routes::records::{list_all_records, find_record, create_new_record, edit_record, delete_record_by_id},
-    routes::record_stores::{list_all_stores, create_record_store, edit_record_store, find_record_store, delete_record_store},
+    routes::records::{
+        // wishlists:
+        get_users_wishlist, add_to_user_wishlist, put_wishlist_record, remove_wishlist_record, remove_user_wishlist,
+        list_all_records, find_record, create_new_record, edit_record, delete_record_by_id
+    },
+    routes::record_stores::{
+        list_all_stores, create_record_store, edit_record_store, find_record_store, delete_record_store},
     routes::users::{
         list_all_users, find_specific_user, create_user, edit_user, delete_user, 
-        get_user_records, create_user_record, put_user_record, remove_user_records, remove_all_user_records},
+        get_user_records, create_user_record, put_user_record, remove_user_record, remove_all_user_records},
 };
 
 pub async fn status_handler() -> impl IntoResponse {
@@ -55,12 +60,14 @@ pub fn create_router(app_state: Arc<AppState>) -> Router {
         .route("/users/records/{user_id}", get(get_user_records)
                                                             .put(put_user_record)
                                                             .post(create_user_record)
+                                                            .patch(remove_user_record)
                                                                 .delete(remove_all_user_records))
-        .route("/users/records/{user_id}/{record_id}", delete(remove_user_records));
-        // .route("/users/wishlist/{user_id}" get(get_users_wishlist)
-        //                                             .post(add_to_user_wishlist)
-        //                                         .delete(remove_from_user_wishlist))
-        // .route("/users/record_stores/{user_id}", get(get_user_record_stores)
+        .route("/records/wishlist/{user_id}", get(get_users_wishlist)
+                                                    .post(add_to_user_wishlist)
+                                                .put(put_wishlist_record)
+                                            .delete(remove_user_wishlist )
+                                        .patch(remove_wishlist_record));
+        // .route("/record_stores/{user_id}", get(get_user_record_stores)
         //                                                     .post(add_user_record_store)
         //                                                     .delete(delete_user_record_store));
 
