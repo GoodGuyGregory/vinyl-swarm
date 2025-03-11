@@ -1,0 +1,928 @@
+{
+	"info": {
+		"_postman_id": "a231d836-abdc-4ecb-91cf-1cc0a128bde2",
+		"name": "Vinyl-Swarm",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "5839344"
+	},
+	"item": [
+		{
+			"name": "Records",
+			"item": [
+				{
+					"name": "Wishlist Records",
+					"item": [
+						{
+							"name": "Get User Wishlist Records",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/records/wishlist/:user_id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"records",
+										"wishlist",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create Wishlist Record",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"artist\": \"Sabrina Carpenter\",\n    \"title\": \"Evolve\",\n    \"released\": \"2022-05-20\",\n    \"genre\": [\"Pop\"],\n    \"format\": \"LP\",\n    \"price\": \"19.99\",\n    \"label\": \"Hollywood Records\",\n    \"duration_length\": \"00:42:10\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/records/wishlist/:user_id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"records",
+										"wishlist",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Put Wishlist Record",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"record_id\": \"0b5765e9-e763-4472-b19c-2262c4208276\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/records/wishlist/:user_id/",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"records",
+										"wishlist",
+										":user_id",
+										""
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Wishlist Record",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "  {\n            \"record_id\": \"afff0231-edd5-48fe-9e13-1f6522508720\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/records/wishlist/:user_id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"records",
+										"wishlist",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Remove Wishlist for User",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/records/wishlist/:user_id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"records",
+										"wishlist",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "Get All Records",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Get Record",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Create Record",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"artist\": \"Daft Punk\",\n    \"title\": \"Random Access Memories\",\n    \"released\": \"\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:8000/api/records",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"records"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Record By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:8000/api/records/:id",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"records",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "a39e49eb-da2b-4c11-a6bc-5ecc6c497531"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Edit Record Details By Record Id",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"artist\": \"Khruangbin & Leon Bridges\",\n    \"title\": \"Texas Sun\",\n    \"released\": \"2020-02-07\",\n    \"genre\": [\"Soul\", \"Psychedelic\", \"R&B\"],\n    \"format\": \"EP\",\n    \"price\": \"23\",\n    \"label\": \"Dead Oceans\",\n    \"duration_length\": \"20:13\"\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:8000/api/records/:id",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"records",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "f5098c0b-2f53-4d8a-b11c-6a4dd2667d8a"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Stores",
+			"item": [
+				{
+					"name": "User Stores",
+					"item": [
+						{
+							"name": "Get User Record Stores",
+							"protocolProfileBehavior": {
+								"disableBodyPruning": true
+							},
+							"request": {
+								"method": "GET",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/record_stores/:id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"record_stores",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create a User Record Store",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n  \"store_name\": \"Light in the Attic Record Shop\",\n  \"store_address\": \"472 1st Ave N\",\n  \"store_city\": \"Seattle\",\n  \"store_state\": \"WA\",\n  \"store_zip\": \"98109\",\n  \"phone_number\": \"206-900-7088\",\n  \"website\": \"https://light-in-the-attic-record-shop.square.site\"\n}\n",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/record_stores/:id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"record_stores",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": ""
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Existing Record Store to User Stores",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/record_stores/:id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"record_stores",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Request",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"record_store_id\": \"4475262d-159e-45e6-9cdc-5031ced85808\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/record_stores/:id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"record_stores",
+										":id"
+									],
+									"variable": [
+										{
+											"key": "id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET all Stores",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "GET Store",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:8000/api/stores/:id",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"stores",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Record Store",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:8000/api/stores/:id",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"stores",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create a Record Store",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"store_name\": \"Jackpot Records\",\n    \"store_address\": \"3574 SE Hawthorne Blvd\",\n    \"store_city\": \"Portland\",\n    \"store_state\": \"OR\",\n    \"store_zip\": \"97214\",\n    \"phone_number\": \"503-239-7561\",\n    \"website\": \"https://jackpotrecords.com/\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:8000/api/stores",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"stores"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Update a Record Store",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"store_name\": \"Missisipi Records\",\n    \"store_address\": \"5202 N Albina Ave\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:8000/api/stores/:id",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"stores",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "a38e4acb-d390-4487-a28c-a98d1eac1e3a"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Users",
+			"item": [
+				{
+					"name": "User Records",
+					"item": [
+						{
+							"name": "Get User Records",
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/users/records/:user_id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"users",
+										"records",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Create User Record",
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"artist\": \"Emancipator\",\n    \"title\": \"Soon It Will Be Cold Enough\",\n    \"released\": \"2006-11-06\",\n    \"genre\": [\"Downtempo\", \"Electronic\", \"Trip-Hop\"],\n    \"format\": \"LP\",\n    \"price\": \"24.99\",\n    \"label\": \"Loci Records\",\n    \"duration_length\": \"00:50:14\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/users/records/:user_id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"users",
+										"records",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Delete ALL User Records",
+							"request": {
+								"method": "DELETE",
+								"header": [],
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/users/records/:user_id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"users",
+										"records",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "Add Record to User Collection",
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"record_id\": \"0b5765e9-e763-4472-b19c-2262c4208276\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/users/records/:user_id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"users",
+										"records",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						},
+						{
+							"name": "New Request",
+							"request": {
+								"method": "PATCH",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"record_id\": \"afff0231-edd5-48fe-9e13-1f6522508720\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "http://0.0.0.0:8000/api/users/records/:user_id",
+									"protocol": "http",
+									"host": [
+										"0",
+										"0",
+										"0",
+										"0"
+									],
+									"port": "8000",
+									"path": [
+										"api",
+										"users",
+										"records",
+										":user_id"
+									],
+									"variable": [
+										{
+											"key": "user_id",
+											"value": "d908bdea-8761-4ac0-b1c0-ded15ef4c3f8"
+										}
+									]
+								}
+							},
+							"response": []
+						}
+					]
+				},
+				{
+					"name": "GET All Users",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "GET User",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_name\": \"angie-howard\",\n    \"user_first_name\": \"Angie\",\n    \"user_last_name\": \"Witt\",\n    \"user_email\": \"angiemarie1123@gmail.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:8000/api/users/:user_name",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								":user_name"
+							],
+							"variable": [
+								{
+									"key": "user_name",
+									"value": ""
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"user_name\": \"forest_park\",\n    \"user_first_name\": \"Angie\", \n    \"user_last_name\": \"Howard\",\n    \"user_email\": \"ahoward@yahoo.com\",\n    \"user_password\": \"taco_flavored_kisses\"\n\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://0.0.0.0:8000/api/users",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Remove User By Id",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "http://0.0.0.0:8000/api/users/:id",
+							"protocol": "http",
+							"host": [
+								"0",
+								"0",
+								"0",
+								"0"
+							],
+							"port": "8000",
+							"path": [
+								"api",
+								"users",
+								":id"
+							],
+							"variable": [
+								{
+									"key": "id",
+									"value": "7569ea46-7415-4f30-a241-901111a435c7"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
