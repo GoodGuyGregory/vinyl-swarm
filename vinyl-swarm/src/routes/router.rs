@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use axum::{
     response::IntoResponse, 
-    routing::{get},
+    routing::{get, delete},
     Json, 
     Router
 };
@@ -14,7 +14,7 @@ use crate::{
     routes::record_stores::{list_all_stores, create_record_store, edit_record_store, find_record_store, delete_record_store},
     routes::users::{
         list_all_users, find_specific_user, create_user, edit_user, delete_user, 
-        get_user_records, remove_all_user_records},
+        get_user_records, create_user_record, put_user_record, remove_user_records, remove_all_user_records},
 };
 
 pub async fn status_handler() -> impl IntoResponse {
@@ -53,8 +53,10 @@ pub fn create_router(app_state: Arc<AppState>) -> Router {
                             .patch(edit_user)
                         .delete(delete_user))
         .route("/users/records/{user_id}", get(get_user_records)
-                                                                // .post(create_user_record)
-                                                                .delete(remove_all_user_records));
+                                                            .put(put_user_record)
+                                                            .post(create_user_record)
+                                                                .delete(remove_all_user_records))
+        .route("/users/records/{user_id}/{record_id}", delete(remove_user_records));
         // .route("/users/wishlist/{user_id}" get(get_users_wishlist)
         //                                             .post(add_to_user_wishlist)
         //                                         .delete(remove_from_user_wishlist))

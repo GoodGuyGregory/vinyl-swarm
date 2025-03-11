@@ -158,7 +158,7 @@ pub async fn edit_record(
 /// unwraps the Vec<String> and takes it's values.
 /// or supplies and empty string vec if it fails
 /// join supplies the commas for PostgreSQL Array
-fn combine_supplied_genres(record_genres: Option<Vec<String>>) -> Vec<String> {
+pub fn combine_supplied_genres(record_genres: Option<Vec<String>>) -> Vec<String> {
     record_genres
         .unwrap_or_else(|| vec![])  
 }
@@ -172,7 +172,7 @@ pub async fn create_new_record(
     Json(body): Json<CreateRecordSchema>
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
 
-    // query for the record
+    // query for the new record insertion
     let query_result = sqlx::query_as!(
         RecordModel,
         "INSERT INTO records (artist, title, released, genre, format, price, label, duration_length)
