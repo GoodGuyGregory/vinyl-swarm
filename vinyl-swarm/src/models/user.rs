@@ -11,6 +11,12 @@ pub struct FilterOptions {
 }
 
 
+#[derive(Serialize, Deserialize, Debug)]
+pub struct PutUserRecord {
+    pub record_id: Uuid
+}
+
+
 // due to security concerns
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UserResponseSchema {
