@@ -2,13 +2,13 @@ use std::sync::Arc;
 use bcrypt::{DEFAULT_COST, hash};
 use bigdecimal::BigDecimal;
 use axum::{
-    body::Body, extract::{Path, Query, State}, http::StatusCode, response::IntoResponse, Json
+    extract::{Path, Query, State}, http::StatusCode, response::IntoResponse, Json
 };
 
 use serde_json::json;
 use uuid::Uuid;
 
-use crate::AppState;
+use crate::{models::user::PatchUserRecord, AppState};
 use crate::{
     models::user::{
         FilterOptions, 
@@ -464,10 +464,10 @@ pub async fn remove_all_user_records(
 } 
 
 // DELETE all user records 
-pub async fn remove_user_records(
+pub async fn remove_user_record(
     Path(user_id): Path<Uuid>,
-    Path(record_id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
+    Json(body): Json<PatchUserRecord>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
 
     let user_check = sqlx::query!("SELECT user_id FROM users WHERE user_id = $1", user_id)
@@ -485,7 +485,7 @@ pub async fn remove_user_records(
     }
 
     // Query for the record
-    let record_check = sqlx::query!("SELECT record_id FROM records WHERE record_id = $1", record_id)
+    let record_check = sqlx::query!("SELECT record_id FROM records WHERE record_id = $1", body.record_id)
         .fetch_optional(&data.db)
         .await
         .unwrap();
@@ -493,7 +493,7 @@ pub async fn remove_user_records(
     if record_check.is_none() {
         let error_response = serde_json::json!({
             "status": "fail",
-            "message": format!("Record with id {} not found", record_id)
+            "message": format!("Record with id {} not found", body.record_id)
         });
         return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }
@@ -501,7 +501,7 @@ pub async fn remove_user_records(
     let rows_affected = sqlx::query!(
         "DELETE FROM user_records WHERE user_id = $1 AND record_id = $2",
         user_id, 
-        record_id
+        body.record_id
     )
     .execute(&data.db)
     .await
@@ -511,7 +511,7 @@ pub async fn remove_user_records(
     if rows_affected == 0 {
         let error_response = serde_json::json!({
             "status": "fail",
-            "message": format!("No user_records found for user_id: {} and record_id: {}", user_id, record_id)
+            "message": format!("No user_records found for user_id: {} and record_id: {}", user_id, body.record_id)
         });
         return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }

@@ -2,15 +2,17 @@ use std::sync::Arc;
 
 use bigdecimal::BigDecimal;
 use uuid::Uuid;
-use axum::{
-    body::{self, Body}, extract::{Path, Query, State}, http::StatusCode, response::IntoResponse, routing::get, Json
+use axum::{ 
+    extract::{Path, Query, State}, http::StatusCode, response::IntoResponse, Json
 };
 
-use chrono::offset;
 use serde_json::json;
 
-use crate::{models::record::{CreateRecordSchema, UpdateRecordSchema}, AppState};
-use crate::models::record::{RecordModel, FilterOptions};
+use crate::{
+    models::{record::{CreateRecordSchema, FilterOptions, RecordModel, UpdateRecordSchema}, 
+    user::{PutUserRecord, PatchUserRecord, UserModel}},
+    AppState
+};
 
 /// GET all records from the database
 pub async fn list_all_records(
@@ -238,4 +240,285 @@ pub async fn delete_record_by_id(
     // assume it successfully deleted the record_store requested
     Ok(StatusCode::NO_CONTENT)
 } 
+
+// WISHLIST ENDPOINTS:
+
+pub async fn get_users_wishlist(
+    Path(user_id): Path<Uuid>,
+    State(data): State<Arc<AppState>>
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    // query the db
+    let user_wishlist_query: Vec<Uuid> = sqlx::query!("SELECT record_id FROM user_wishlist WHERE user_id = $1", user_id)
+        .fetch_all(&data.db)
+        .await
+        .unwrap()
+        //iterate over the returned record ids
+        .into_iter()
+        .map(|row| row.record_id)
+        .collect();
+
+    // show something to to client
+    // basically there are no wishlist records.
+    if user_wishlist_query.is_empty() {
+        return Ok(StatusCode::OK.into_response());
+    }
+
+    // query for tunes users dream of owning on vinyl
+    let record_query = sqlx::query_as!(
+            RecordModel,
+            "SELECT * FROM records WHERE record_id = ANY($1)",
+            &user_wishlist_query,
+        )
+        .fetch_all(&data.db)
+        .await;
+
+    match record_query {
+        Ok(wishlist_records) => {
+            let user_wishlist_response = json!({
+                "status": "success",
+                "results": wishlist_records.len(),
+                "user_wishlist_records": wishlist_records,
+            });
+            return Ok(Json(user_wishlist_response).into_response());
+        }
+        Err(_) => {
+            let error_response = json!({
+                "status": "fail",
+                "message": format!("no user_wishlist records found for user id: {}", user_id)
+            });
+            return Err((StatusCode::NOT_FOUND, Json(error_response)));
+        }
+    }
+}
+
+/// takes a whole record and adds items as a wish list
+pub async fn add_to_user_wishlist(
+    Path(user_id): Path<Uuid>,
+    State(data): State<Arc<AppState>>,
+    Json(body): Json<CreateRecordSchema>
+) -> impl IntoResponse {
+
+     //query for the user if they even exist...
+    let user_query_check = sqlx::query_as!(
+        UserModel,
+        "SELECT * FROM users WHERE user_id = $1",
+        user_id
+    )
+    .fetch_one(&data.db)
+    .await;
+
+    // ensure the user exists 
+    match user_query_check {
+        // yay! found a user! let's add some sweet music
+        Ok(found_user) => {
+            // query for the new record insertion
+            let create_record_result = sqlx::query_as!(
+                RecordModel,
+                "INSERT INTO records (artist, title, released, genre, format, price, label, duration_length)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *",
+                body.artist,
+                body.title,
+                body.released,
+                &combine_supplied_genres(body.genre),
+                // unwrap if not supplied
+                body.format.as_deref().unwrap_or("LP"),
+                // if not supplied create empty value
+                body.price.unwrap_or(BigDecimal::from(0)),
+                body.label,
+                body.duration_length
+            )
+            .fetch_one(&data.db)
+            .await;
+
+            // hopefully I get a record model back.
+
+            match create_record_result {
+                Ok(created_record) => {
+                    // add this to the user_records table by associated user_id
+                    let user_wishlist_record = sqlx::query!(
+                        "INSERT INTO user_wishlist ( user_id, record_id) VALUES ($1, $2) RETURNING user_wish_list_id, user_id, record_id, added_at",
+                        found_user.user_id,
+                        created_record.record_id,
+                    )
+                    .fetch_one(&data.db)
+                    .await;
+
+                    match user_wishlist_record {
+                        Ok(created_wish_list_record) => {
+                            let created_wishlist_response = serde_json::json!({
+                                "status": "success",
+                                "records_collected": "1",
+                                "user_id": created_wish_list_record.user_id,
+                                "user_record_id": created_wish_list_record.record_id,
+                                "record": created_record,
+                            });
+                            (StatusCode::OK, Json(created_wishlist_response))
+                        },
+                        Err(e) => {
+                            let error_response = serde_json::json!({
+                                "status": "fail",
+                                "message": format!("error when collecting wishlist items for user_id: {}, {}", user_id, e),
+                            });
+                            (StatusCode::INTERNAL_SERVER_ERROR, Json(error_response))
+                        }
+                    }
+                }
+                // Error finding user or something went wrong
+                Err(e) => {
+                    (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({"status": "error", "message": format!("{:?}", e)})))
+                }
+            }
+        }
+        // assume not an valid uuid
+        Err(_) => {
+            let error_response = serde_json::json!(
+                {
+                    "status": "fail",
+                    "message": format!("user_id {} not found", user_id)
+                });
+            
+            return (StatusCode::NOT_FOUND, Json(error_response));
+        }
+    }
+}
+
+
+pub async fn put_wishlist_record(
+    Path(user_id): Path<Uuid>,
+    State(data): State<Arc<AppState>>,
+    Json(body): Json<PutUserRecord>,
+) -> impl IntoResponse {
+    
+    //query for the user if they even exist...
+    let user_query_check = sqlx::query_as!(
+        UserModel,
+        "SELECT * FROM users WHERE user_id = $1",
+        user_id
+    )
+    .fetch_one(&data.db)
+    .await;
+
+
+    // ensure the user exists 
+    match user_query_check {
+        // yay! found a user! let's add some sweet music
+        Ok(found_user) => {
+            println!("SELECTING Record id:");
+            // query for the existing record
+            let query_record_result = sqlx::query_as!(
+                RecordModel,
+                "SELECT * FROM records WHERE record_id = $1",
+                body.record_id,
+            )
+            .fetch_one(&data.db)
+            .await;
+
+            // hopefully I get a record model back.
+
+            match query_record_result {
+                Ok(wished_record) => {
+                    // add this to the user_records table by associated user_id
+                    let user_wishlist_record_query = sqlx::query!(
+                        "INSERT INTO user_wishlist ( user_id, record_id) VALUES ($1, $2) RETURNING user_id, record_id, user_wish_list_id",
+                        found_user.user_id,
+                        wished_record.record_id,
+                    )
+                    .fetch_one(&data.db)
+                    .await;
+
+                    match user_wishlist_record_query {
+                        Ok(wished_user_record) => {
+                            let user_wished_created_response = serde_json::json!({
+                                "status": "success",
+                                "records_collected": "1",
+                                "user_id": wished_user_record.user_id,
+                                "user_wish_list_id": wished_user_record.user_wish_list_id,
+                                "record": wished_record,
+                            });
+
+                            (StatusCode::OK, Json(user_wished_created_response))
+                        },
+                        Err(e) => {
+                            let error_response = serde_json::json!({
+                                "status": "fail",
+                                "message": format!("error when collecting record for user_id: {}, {}", user_id, e),
+                            });
+                            (StatusCode::INTERNAL_SERVER_ERROR, Json(error_response))
+                        }
+                    }
+                }
+                Err(_) => {
+                    (StatusCode::NOT_FOUND, Json(json!({"status": "error", "message": format!("record_id: {} not found", body.record_id)})))
+                }
+            }
+        }
+        // assume not an valid uuid
+        Err(_) => {
+            let error_response = serde_json::json!(
+                {
+                    "status": "fail",
+                    "message": format!("record {} not found", body.record_id)
+                });
+            
+            return (StatusCode::NOT_FOUND, Json(error_response));
+        }
+    }
+
+}
+
+// DELETE a specific record from the wishlist
+pub async fn remove_wishlist_record(
+    Path(user_id): Path<Uuid>,
+    State(data): State<Arc<AppState>>,
+    Json(body): Json<PatchUserRecord>,
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+
+    let check_user_query = sqlx::query!(
+        "SELECT user_id FROM users WHERE user_id = $1",
+        user_id)
+        .fetch_optional(&data.db)
+        .await
+        .unwrap();
+
+    // check to ensure the user even exists
+    if check_user_query.is_none() {
+        let error_response = serde_json::json!(
+            {
+                "status":"fail",
+                "message": format!("user_id {} not found", user_id)
+            }
+        );
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
+    }
+
+    // check for the existence of the wishlist record
+    let wish_list_record_check = sqlx::query!(
+        "DELETE from user_wishlist WHERE record_id = $1 AND user_id = $2",
+        body.record_id,
+        user_id,
+    )
+    .execute(&data.db)
+    .await
+    .unwrap()
+    .rows_affected();
+
+    if wish_list_record_check == 0 {
+        let error_response = serde_json::json!({
+            "status": "fail",
+            "message": format!("No wish_lists record found for user_id: {} with record_id: {}", user_id, body.record_id)
+        });
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
+    }
+
+    Ok(StatusCode::NO_CONTENT)
+
+}
+
+
+pub async fn remove_user_wishlist() {
+    println!("🚮 Removing User's Wishlist")
+
+    
+
+}
 
