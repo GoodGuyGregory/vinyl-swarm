@@ -55,7 +55,7 @@ pub async fn list_all_records(
 
 pub async fn find_record(
     Path(id): Path<Uuid>,
-    State(data): State<Arc<AppState>>
+    State(data): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> 
 {
 
@@ -515,10 +515,27 @@ pub async fn remove_wishlist_record(
 }
 
 
-pub async fn remove_user_wishlist() {
-    println!("🚮 Removing User's Wishlist")
-
+pub async fn remove_user_wishlist(
+    Path(user_id): Path<Uuid>,
+    State(data): State<Arc<AppState>>
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
+    println!("🚮 removing user's records wishlist");
     
+    // checking for the user id. cause, something has to be done with an actual person
+    let rows_affected = sqlx::query!("DELETE FROM user_wishlist WHERE user_id = $1", user_id)
+        .execute(&data.db)
+        .await
+        .unwrap()
+        .rows_affected();
 
+    if rows_affected == 0 {
+        let error_response = serde_json::json!({
+            "status": "fail",
+            "message": format!("no records found for user id: {}", user_id)
+        });
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
+    }
+
+    println!("user: {} user_wishlist cleared", user_id);
+    Ok(StatusCode::NO_CONTENT) 
 }
-
