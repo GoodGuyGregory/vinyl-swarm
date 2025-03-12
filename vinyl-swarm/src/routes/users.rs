@@ -287,6 +287,8 @@ pub async fn create_user_record(
     match user_query_check {
         // yay! found a user! let's add some sweet music
         Ok(found_user) => {
+
+
             // query for the new record insertion
             let create_record_result = sqlx::query_as!(
                 RecordModel,
@@ -339,9 +341,9 @@ pub async fn create_user_record(
                         }
                     }
                 }
-                // something went wrongo
-                Err(e) => {
-                    (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({"status": "error", "message": format!("{:?}", e)})))
+                // something went wrong
+                Err(_) => {
+                    (StatusCode::CONFLICT,Json(json!({"status": "error", "message": format!("record {} by {} already exists", body.title, body.artist)})))
                 }
             }
         }
@@ -392,6 +394,25 @@ pub async fn put_user_record(
 
             match query_record_result {
                 Ok(created_record) => {
+
+                    // check to confirm 
+                    if let Ok(Some(_)) = sqlx::query!(
+                        "SELECT * FROM user_records WHERE record_id = $1",
+                        body.record_id
+                    )
+                    .fetch_optional(&data.db)
+                    .await {
+                        let duplicate_response = json!(
+                            {
+                                "status": "error",
+                                "message": format!("record_id: {} already in collection", body.record_id)
+                            }
+                        );
+
+                        return (StatusCode::CONFLICT, Json(duplicate_response));
+                    }
+
+
                     // add this to the user_records table by associated user_id
                     let user_records_insert_query = sqlx::query!(
 
@@ -432,7 +453,7 @@ pub async fn put_user_record(
             let error_response = serde_json::json!(
                 {
                     "status": "fail",
-                    "message": format!("record {} not found", body.record_id)
+                    "message": format!("user_id: {} not found", body.record_id)
                 });
             
             return (StatusCode::NOT_FOUND, Json(error_response));

@@ -62,6 +62,22 @@ pub async fn create_record_store(
     Json(body): Json<CreateRecordStoreSchema>
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
 
+    // check for an existing record_store
+    if let Ok(Some(found_store)) = sqlx::query_as!(
+        RecordStoreModel,
+        "SELECT * FROM record_stores WHERE store_name = $1 AND store_address = $2 AND store_city = $3 AND store_state = $4",
+        body.store_name,
+        body.store_address, 
+        body.store_city,
+        body.store_state
+    ).fetch_optional(&data.db).await {
+        return Err((
+            StatusCode::CONFLICT,
+            Json(json!({"status": "fail", "message": format!("Record store '{}' already exists.", found_store.store_name)}))
+        ));
+
+    }
+
     // create the insert statement to add another record store
     let query_result = sqlx::query_as!(
         RecordStoreModel, 
@@ -116,7 +132,7 @@ pub async fn find_record_store(
                     "status": "success",
                     "record_store": record_store
                 });
-
+    
             return Ok(Json(record_store_resp));
         }
         Err(_) => {

@@ -24,7 +24,8 @@ CREATE TABLE
         format VARCHAR(50),
         price DECIMAL(10,2),
         label VARCHAR(150) NOT NULL,
-        duration_length TIME NOT NULL
+        duration_length TIME NOT NULL,
+        CONSTRAINT unique_artist_release UNIQUE (artist, title, format)
     );
 
 -- record_stores table
@@ -37,7 +38,8 @@ CREATE TABLE
         store_state VARCHAR(50) NOT NULL,
         store_zip VARCHAR(20) NOT NULL, 
         phone_number VARCHAR(20), 
-        website TEXT
+        website TEXT,
+        CONSTRAINT unique_record_store UNIQUE (store_name, store_address, store_city, store_state)
     );
 
 
@@ -46,7 +48,8 @@ CREATE TABLE
     IF NOT EXISTS user_record_stores (
         user_favorite_stores_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_key UUID NOT NULL REFERENCES users (user_id) ON DELETE CASCADE,
-        record_store_id UUID NOT NULL REFERENCES record_stores (record_store_id) ON DELETE CASCADE
+        record_store_id UUID NOT NULL REFERENCES record_stores (record_store_id) ON DELETE CASCADE,
+        CONSTRAINT unique_user_record_store UNIQUE (user_key, record_store_id)
     );
 
 -- user_records table
@@ -55,7 +58,8 @@ CREATE TABLE
     user_record_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
     record_id UUID NOT NULL REFERENCES records(record_id) ON DELETE CASCADE,
-    added_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+    added_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    CONSTRAINT unique_user_record UNIQUE (user_id, record_id)
 );
 
 -- user_wish_list table
@@ -64,7 +68,8 @@ CREATE TABLE
         user_wish_list_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         user_id UUID NOT NULL REFERENCES users(user_id) ON DELETE CASCADE,
         record_id UUID NOT NULL REFERENCES records(record_id) ON DELETE CASCADE,
-        added_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+        added_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+        CONSTRAINT unique_wish_list_record UNIQUE (user_id, record_id)
     );
 
 
