@@ -205,10 +205,10 @@ pub async fn create_new_record(
             return Ok((StatusCode::CREATED, Json(record_response)))
         }
 
-        Err(e) => {
+        Err(_) => {
             return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(json!({"status": "error", "message": format!("{:?}", e)}))
+                StatusCode::CONFLICT,
+                Json(json!({"status": "error", "message": format!("record {} by {} already exists", body.title, body.artist)}))
             ));
         }
     }
@@ -260,7 +260,12 @@ pub async fn get_users_wishlist(
     // show something to to client
     // basically there are no wishlist records.
     if user_wishlist_query.is_empty() {
-        return Ok(StatusCode::OK.into_response());
+        let user_wishlist_response = json!({
+            "status": "success",
+            "results": "0",
+            "user_wishlist_records": [],
+        });
+        return Ok(Json(user_wishlist_response).into_response());
     }
 
     // query for tunes users dream of owning on vinyl
@@ -364,8 +369,8 @@ pub async fn add_to_user_wishlist(
                     }
                 }
                 // Error finding user or something went wrong
-                Err(e) => {
-                    (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({"status": "error", "message": format!("{:?}", e)})))
+                Err(_) => {
+                    (StatusCode::CONFLICT, Json(json!({"status": "error", "message": format!("record {:?} by {} already exists", body.title, body.artist)})))
                 }
             }
         }
@@ -398,6 +403,19 @@ pub async fn put_wishlist_record(
     .fetch_one(&data.db)
     .await;
 
+    // check for the existing record on the wishlist
+    if let Ok(Some(_)) = sqlx::query!(
+        "SELECT * FROM user_wishlist WHERE record_id = $1",
+        body.record_id
+    ).fetch_optional(&data.db).await {
+        let error_response = serde_json::json!({
+            "status": "fail",
+            "message": format!("record_id: {} already in user wishlist", body.record_id ),
+        });
+        
+        return (StatusCode::CONFLICT, Json(error_response));
+
+    }
 
     // ensure the user exists 
     match user_query_check {
