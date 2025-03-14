@@ -40,7 +40,7 @@ pub async fn list_all_records(
                 "results": records.len(),
                 "records": records,
             });
-            println!("GET: returning all records");
+            println!("GET: returning all records (default limit: 10)");
             (StatusCode::OK, Json(json_response))
         }
         Err(_) => {
@@ -147,6 +147,8 @@ pub async fn edit_record(
                     "record": record
                 });
 
+            println!("PATCH: edited {} by {}", record.title, record.artist);
+
             return  Ok((StatusCode::OK, Json(record_response)));
         }
 
@@ -242,6 +244,7 @@ pub async fn delete_record_by_id(
     }
 
     // assume it successfully deleted the record_store requested
+    println!("DELETE: removed record_id {}", id);
     Ok(StatusCode::NO_CONTENT)
 } 
 
@@ -269,6 +272,7 @@ pub async fn get_users_wishlist(
             "results": "0",
             "user_wishlist_records": [],
         });
+        println!("GET: returning empty wish list for user_id: {}", user_id);
         return Ok(Json(user_wishlist_response).into_response());
     }
 
@@ -288,6 +292,7 @@ pub async fn get_users_wishlist(
                 "results": wishlist_records.len(),
                 "user_wishlist_records": wishlist_records,
             });
+            println!("GET: returning {} wishlist records for user_id: {}", wishlist_records.len(), user_id);
             return Ok(Json(user_wishlist_response).into_response());
         }
         Err(_) => {
@@ -361,6 +366,7 @@ pub async fn add_to_user_wishlist(
                                 "user_record_id": created_wish_list_record.record_id,
                                 "record": created_record,
                             });
+                            println!("POST: added '{}' by '{}' to user_id: {} wish list ", created_record.title, created_record.artist, created_wish_list_record.user_id);
                             (StatusCode::OK, Json(created_wishlist_response))
                         },
                         Err(e) => {
@@ -458,6 +464,8 @@ pub async fn put_wishlist_record(
                                 "record": wished_record,
                             });
 
+                            println!("PUT: record {} by {} to user_id: {} wishlist", wished_record.title, wished_record.artist, wished_user_record.user_id);
+
                             (StatusCode::OK, Json(user_wished_created_response))
                         },
                         Err(e) => {
@@ -532,6 +540,7 @@ pub async fn remove_wishlist_record(
         return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }
 
+    println!("DELETE: successfully removed {} from user wishlist", body.record_id);
     Ok(StatusCode::NO_CONTENT)
 
 }

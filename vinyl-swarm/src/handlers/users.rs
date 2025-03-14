@@ -53,6 +53,7 @@ pub async fn list_all_users(
                 "results": user_responses.len(),
                 "users": user_responses,
             });
+            println!("GET: returning users");
             (StatusCode::OK, Json(json_response))
         }
         Err(_) => {
@@ -83,6 +84,8 @@ pub async fn find_specific_user(Path(id): Path<Uuid>, State(data): State<Arc<App
                 "status": "success", 
                 "user": converted_user,
                 });
+
+            println!("GET: returning details for {}", converted_user.user_name);
 
             return Ok(Json(user_response));
         }
@@ -128,6 +131,8 @@ pub async fn create_user(State(data): State<Arc<AppState>>, Json(body): Json<Cre
                 "status": "success",
                 "user": converted_user,
                 });
+
+            println!("POST: created user {}", converted_user.user_name);
 
             return Ok((StatusCode::CREATED, Json(user_response)));
         }
@@ -199,6 +204,8 @@ pub async fn edit_user(
                 "status": "success",
                 "user": converted_user
             });
+
+            println!("PATCH: successfully modified {} details", converted_user.user_name);
             
             return Ok((StatusCode::OK, Json(user_response)));
         }
@@ -232,6 +239,9 @@ pub async fn get_user_records(
 
     // show something to to client
     if user_records_query.is_empty() {
+
+        println!("GET: returning user_id: {} records", user_id);
+
         return Ok(StatusCode::OK.into_response());
     }
 
@@ -251,6 +261,9 @@ pub async fn get_user_records(
                 "results": user_records.len(),
                 "user_records": user_records,
             });
+            
+            println!("GET: returning user_id: {} records", user_id);
+
             return Ok(Json(user_records_response).into_response());
         }
         Err(_) => {
@@ -330,6 +343,9 @@ pub async fn create_user_record(
                                 "user_record_id": created_user_record.user_record_id,
                                 "record": created_record,
                             });
+
+                            println!("POST: collect '{}' by '{}' for user: {}", created_record.title, created_record.artist, created_user_record.user_id);
+
                             (StatusCode::OK, Json(create_user_record_resp))
                         },
                         Err(e) => {
@@ -432,6 +448,9 @@ pub async fn put_user_record(
                                 "user_record_id": created_user_record.user_record_id,
                                 "record": created_record,
                             });
+
+                            println!("PUT: added '{}' by '{}' to  user_id: {} collection ", created_record.title, created_record.artist, created_user_record.user_id);
+
                             (StatusCode::OK, Json(create_user_record_resp))
                         },
                         Err(e) => {
@@ -480,6 +499,8 @@ pub async fn remove_all_user_records(
         });
         return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }
+
+    println!("DELETE: removed user_id: {} record collection", id);
 
     Ok(StatusCode::NO_CONTENT) // Make sure this is inside the function and properly closed
 } 
@@ -537,6 +558,8 @@ pub async fn remove_user_record(
         return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }
 
+    println!("PATCH: removed record_id {} from user_id: {} collection", body.record_id, user_id);
+
     Ok(StatusCode::NO_CONTENT)
 } 
 
@@ -564,6 +587,8 @@ pub async fn delete_user(
         );
         return Err((StatusCode::NOT_FOUND, Json(error_reponse)));
     }
+
+    println!("DELETE: removed user_id: {}", id);
 
     // assume something disappeared
     Ok(StatusCode::NO_CONTENT)
