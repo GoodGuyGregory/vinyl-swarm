@@ -1,7 +1,7 @@
 use chrono::{NaiveDate, NaiveTime};
-use serde::{Serialize, Deserialize};
-use uuid::Uuid;
+use serde::{Deserialize, Serialize};
 use sqlx::types::BigDecimal;
+use uuid::Uuid;
 
 #[derive(Deserialize, Debug, Default)]
 pub struct FilterOptions {
@@ -35,7 +35,6 @@ pub struct UpdateRecordSchema {
     pub label: Option<String>,
     pub duration_length: Option<NaiveTime>,
 }
-
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct RecordModel {
