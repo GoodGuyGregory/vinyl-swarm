@@ -1,20 +1,25 @@
 use std::sync::Arc;
 
 use axum::{
-    extract::{Path, Query, State}, http::StatusCode, response::IntoResponse, Json
+    extract::{Path, Query, State},
+    http::StatusCode,
+    response::IntoResponse,
+    Json,
 };
 
-use serde_json::json;
-use uuid::Uuid;
 use crate::AppState;
 use crate::{
+    models::store::{
+        CreateRecordStoreSchema, FilterOptions, PatchRecordStoreSchema, PutRecordStoreSchema,
+        RecordStoreModel, UpdateRecordStoreSchema,
+    },
     models::user::UserModel,
-    models::store::{RecordStoreModel, FilterOptions, UpdateRecordStoreSchema, PatchRecordStoreSchema,  PutRecordStoreSchema, CreateRecordStoreSchema}
 };
-
+use serde_json::json;
+use uuid::Uuid;
 
 /// GET all record stores from the database
-/// returns all record_stores 
+/// returns all record_stores
 /// params include the FilterOptions Struct to allow for pagination,
 /// this will return 10 if there is no chosen option query parameter.
 pub async fn list_all_stores(
@@ -30,7 +35,8 @@ pub async fn list_all_stores(
         "SELECT * FROM record_stores ORDER BY store_name LIMIT $1 OFFSET $2",
         limit as i32,
         offset as i32
-    ).fetch_all(&data.db)
+    )
+    .fetch_all(&data.db)
     .await;
 
     match query_result {
@@ -60,15 +66,14 @@ pub async fn list_all_stores(
 /// POST methods are recommended for this handler
 pub async fn create_record_store(
     State(data): State<Arc<AppState>>,
-    Json(body): Json<CreateRecordStoreSchema>
+    Json(body): Json<CreateRecordStoreSchema>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-
     // check for an existing record_store
     if let Ok(Some(found_store)) = sqlx::query_as!(
         RecordStoreModel,
         "SELECT * FROM record_stores WHERE store_name = $1 AND store_address = $2 AND store_city = $3 AND store_state = $4",
         body.store_name,
-        body.store_address, 
+        body.store_address,
         body.store_city,
         body.store_state
     ).fetch_optional(&data.db).await {
@@ -81,7 +86,7 @@ pub async fn create_record_store(
 
     // create the insert statement to add another record store
     let query_result = sqlx::query_as!(
-        RecordStoreModel, 
+        RecordStoreModel,
         "INSERT INTO record_stores (store_name, store_address, store_city, store_state, store_zip, phone_number, website)
         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *",
         body.store_name.to_string(),
@@ -92,7 +97,7 @@ pub async fn create_record_store(
         body.phone_number.to_owned().unwrap_or("".to_string()),
         body.website.to_owned().unwrap_or("".to_string())
     ).fetch_one(&data.db)
-    .await;  
+    .await;
 
     match query_result {
         Ok(created_record_store) => {
@@ -101,7 +106,10 @@ pub async fn create_record_store(
                 "record_store": created_record_store
             });
 
-            println!("POST: created {} record store ", created_record_store.store_name);
+            println!(
+                "POST: created {} record store ",
+                created_record_store.store_name
+            );
 
             return Ok((StatusCode::CREATED, Json(record_store_response)));
         }
@@ -109,43 +117,44 @@ pub async fn create_record_store(
             // otherwise it's not a duplicate and something went wrong
             return Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
-                Json(json!({"status": "error", "message": format!("{:?}", e)}))
+                Json(json!({"status": "error", "message": format!("{:?}", e)})),
             ));
         }
     }
-
 }
 
 pub async fn find_record_store(
-    Path(id): Path<Uuid>, 
-    State(data): State<Arc<AppState>>
+    Path(id): Path<Uuid>,
+    State(data): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-
     // get the record store assuming it's a valid uuid
     let query_result = sqlx::query_as!(
-        RecordStoreModel, "SELECT * FROM record_stores WHERE record_store_id = $1",id)
-        .fetch_one(&data.db)
-        .await;
+        RecordStoreModel,
+        "SELECT * FROM record_stores WHERE record_store_id = $1",
+        id
+    )
+    .fetch_one(&data.db)
+    .await;
 
     // match for error from the Result
     match query_result {
         Ok(record_store) => {
             let record_store_resp = serde_json::json!(
-                {
-                    "status": "success",
-                    "record_store": record_store
-                });
+            {
+                "status": "success",
+                "record_store": record_store
+            });
 
             println!("GET: returning {} record store", record_store.store_name);
-    
+
             return Ok(Json(record_store_resp));
         }
         Err(_) => {
             let error_response = serde_json::json!(
-                {
-                    "status": "fail",
-                    "message": format!("record_store_id {} not found", id)
-                });
+            {
+                "status": "fail",
+                "message": format!("record_store_id {} not found", id)
+            });
 
             return Err((StatusCode::NOT_FOUND, Json(error_response)));
         }
@@ -155,23 +164,24 @@ pub async fn find_record_store(
 pub async fn edit_record_store(
     Path(id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
-    Json(body): Json<UpdateRecordStoreSchema>
+    Json(body): Json<UpdateRecordStoreSchema>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    
     let query_result = sqlx::query_as!(
         RecordStoreModel,
-        "SELECT * FROM record_stores WHERE record_store_id = $1", id)
-        .fetch_one(&data.db)
-        .await;
-    
+        "SELECT * FROM record_stores WHERE record_store_id = $1",
+        id
+    )
+    .fetch_one(&data.db)
+    .await;
+
     if query_result.is_err() {
         let error_response = serde_json::json!(
-            {
-                "status": "fail",
-                "message": format!("record store id: {} not found", id)
-            });
+        {
+            "status": "fail",
+            "message": format!("record store id: {} not found", id)
+        });
 
-            return  Err((StatusCode::NOT_FOUND, Json(error_response)));
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }
 
     let record_store = query_result.unwrap();
@@ -198,30 +208,29 @@ pub async fn edit_record_store(
         // no errors -> respond with the record store
         Ok(record_store) => {
             let record_store_response = serde_json::json!(
-                {
-                    "status": "success",
-                    "record_store": record_store
-                });
-            
+            {
+                "status": "success",
+                "record_store": record_store
+            });
+
             println!("PATCH: editing {} store details", record_store.store_name);
 
-            return  Ok((StatusCode::OK, Json(record_store_response)));
+            return Ok((StatusCode::OK, Json(record_store_response)));
         }
 
         Err(err) => {
-            return Err((StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({"status": "error", "message": format!("{:?}", err)})),
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({"status": "error", "message": format!("{:?}", err)})),
             ));
         }
     }
-
 }
 
 pub async fn delete_record_store(
     Path(id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-
     let delete_query = sqlx::query!("DELETE FROM record_stores WHERE record_store_id = $1", id)
         .execute(&data.db)
         .await
@@ -241,19 +250,15 @@ pub async fn delete_record_store(
     // assume it successfully deleted the record_store requested
     println!("DELETE: removed record_store: {}", id);
     Ok(StatusCode::NO_CONTENT)
-} 
+}
 
-// USER RECORD STORE ENDPOINTS: 
+// USER RECORD STORE ENDPOINTS:
 pub async fn get_user_record_stores(
     Path(user_id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-
-
     // check for the user.
-    let check_user_query = sqlx::query!(
-        "SELECT user_id FROM users WHERE user_id = $1",
-        user_id)
+    let check_user_query = sqlx::query!("SELECT user_id FROM users WHERE user_id = $1", user_id)
         .fetch_optional(&data.db)
         .await
         .unwrap();
@@ -270,14 +275,17 @@ pub async fn get_user_record_stores(
     }
 
     // query the db
-    let user_stores_query: Vec<Uuid> = sqlx::query!("SELECT record_store_id FROM user_record_stores WHERE user_key = $1", user_id)
-        .fetch_all(&data.db)
-        .await
-        .unwrap()
-        //iterate over the returned record ids
-        .into_iter()
-        .map(|row| row.record_store_id)
-        .collect();
+    let user_stores_query: Vec<Uuid> = sqlx::query!(
+        "SELECT record_store_id FROM user_record_stores WHERE user_key = $1",
+        user_id
+    )
+    .fetch_all(&data.db)
+    .await
+    .unwrap()
+    //iterate over the returned record ids
+    .into_iter()
+    .map(|row| row.record_store_id)
+    .collect();
 
     // show something to to client
     if user_stores_query.is_empty() {
@@ -286,16 +294,16 @@ pub async fn get_user_record_stores(
 
     // query for those sweet tunes you've collected
     let stores_query = sqlx::query_as!(
-            RecordStoreModel,
-            "SELECT * FROM record_stores WHERE record_store_id = ANY($1)",
-            &user_stores_query,
-        )
-        .fetch_all(&data.db)
-        .await;
+        RecordStoreModel,
+        "SELECT * FROM record_stores WHERE record_store_id = ANY($1)",
+        &user_stores_query,
+    )
+    .fetch_all(&data.db)
+    .await;
 
     match stores_query {
         Ok(record_stores) => {
-            // deserialize the model with serde. 
+            // deserialize the model with serde.
             let user_record_stores_response = serde_json::json!({
                 "status": "success",
                 "results": record_stores.len(),
@@ -314,28 +322,20 @@ pub async fn get_user_record_stores(
     }
 
     // look for the store to return.
-
-
 }
 
 pub async fn add_existing_record_store(
     Path(user_id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
-    Json(body): Json<PutRecordStoreSchema>
+    Json(body): Json<PutRecordStoreSchema>,
 ) -> impl IntoResponse {
-
-
     //query for the user if they even exist...
-    let user_query_check = sqlx::query_as!(
-        UserModel,
-        "SELECT * FROM users WHERE user_id = $1",
-        user_id
-    )
-    .fetch_one(&data.db)
-    .await;
+    let user_query_check =
+        sqlx::query_as!(UserModel, "SELECT * FROM users WHERE user_id = $1", user_id)
+            .fetch_one(&data.db)
+            .await;
 
-
-    // ensure the user exists 
+    // ensure the user exists
     match user_query_check {
         // yay! found a user! add the record store now
         Ok(found_user) => {
@@ -369,10 +369,13 @@ pub async fn add_existing_record_store(
                                 "user_favorite_stores_id": user_record_store.user_favorite_stores_id,
                                 "record_store": existing_record_store,
                             });
-                            println!("PUT: adding record_store '{}' to user_id: {} ", existing_record_store.store_name, user_id);
+                            println!(
+                                "PUT: adding record_store '{}' to user_id: {} ",
+                                existing_record_store.store_name, user_id
+                            );
 
                             (StatusCode::OK, Json(user_wished_created_response))
-                        },
+                        }
                         Err(e) => {
                             let error_response = serde_json::json!({
                                 "status": "fail",
@@ -382,45 +385,43 @@ pub async fn add_existing_record_store(
                         }
                     }
                 }
-                Err(_) => {
-                    (StatusCode::NOT_FOUND, Json(json!({"status": "error", "message": format!("record_store_id: {} not found", body.record_store_id)})))
-                }
+                Err(_) => (
+                    StatusCode::NOT_FOUND,
+                    Json(
+                        json!({"status": "error", "message": format!("record_store_id: {} not found", body.record_store_id)}),
+                    ),
+                ),
             }
         }
         // assume not an valid uuid
         Err(_) => {
             let error_response = serde_json::json!(
-                {
-                    "status": "fail",
-                    "message": format!("record_store {} not found", body.record_store_id)
-                });
-            
+            {
+                "status": "fail",
+                "message": format!("record_store {} not found", body.record_store_id)
+            });
+
             return (StatusCode::NOT_FOUND, Json(error_response));
         }
     }
-
 }
 
-pub  async fn add_user_record_store(
+pub async fn add_user_record_store(
     Path(user_id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
-    Json(body): Json<CreateRecordStoreSchema>
+    Json(body): Json<CreateRecordStoreSchema>,
 ) -> impl IntoResponse {
-
     //query for the user if they even exist...
-    let user_query_check = sqlx::query_as!(
-        UserModel,
-        "SELECT * FROM users WHERE user_id = $1",
-        user_id
-    )
-    .fetch_one(&data.db)
-    .await;
+    let user_query_check =
+        sqlx::query_as!(UserModel, "SELECT * FROM users WHERE user_id = $1", user_id)
+            .fetch_one(&data.db)
+            .await;
 
-    // ensure the user exists 
+    // ensure the user exists
     match user_query_check {
         // yay! found a user! let's add an awesome shop
         Ok(found_user) => {
-           // query for the new record_store insertion
+            // query for the new record_store insertion
             let create_record_store = sqlx::query_as!(
                 RecordStoreModel,
                 "INSERT INTO record_stores (store_name, store_address, store_city, store_state, store_zip, phone_number, website)
@@ -457,9 +458,12 @@ pub  async fn add_user_record_store(
                                 "user_record_store_id": inserted_user_store.record_store_id,
                                 "record": created_record_store,
                             });
-                            println!("POST: adding new record_store: '{}' to user_id: {} collection.", created_record_store.store_name, user_id);
+                            println!(
+                                "POST: adding new record_store: '{}' to user_id: {} collection.",
+                                created_record_store.store_name, user_id
+                            );
                             (StatusCode::OK, Json(created_store_response))
-                        },
+                        }
                         Err(e) => {
                             let error_response = serde_json::json!({
                                 "status": "fail",
@@ -470,23 +474,23 @@ pub  async fn add_user_record_store(
                     }
                 }
                 // something went wrong.
-                Err(e) => {
-                    (StatusCode::INTERNAL_SERVER_ERROR, Json(json!({"status": "error", "message": format!("{:?}", e)})))
-                }
+                Err(e) => (
+                    StatusCode::INTERNAL_SERVER_ERROR,
+                    Json(json!({"status": "error", "message": format!("{:?}", e)})),
+                ),
             }
         }
         // assume not an valid uuid
         Err(_) => {
             let error_response = serde_json::json!(
-                {
-                    "status": "fail",
-                    "message": format!("user_id {} not found", user_id)
-                });
-            
+            {
+                "status": "fail",
+                "message": format!("user_id {} not found", user_id)
+            });
+
             return (StatusCode::NOT_FOUND, Json(error_response));
         }
     }
-
 }
 
 pub async fn delete_user_record_store(
@@ -494,11 +498,7 @@ pub async fn delete_user_record_store(
     State(data): State<Arc<AppState>>,
     Json(body): Json<PatchRecordStoreSchema>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    
-
-    let check_user_query = sqlx::query!(
-        "SELECT user_id FROM users WHERE user_id = $1",
-        user_id)
+    let check_user_query = sqlx::query!("SELECT user_id FROM users WHERE user_id = $1", user_id)
         .fetch_optional(&data.db)
         .await
         .unwrap();
@@ -533,6 +533,9 @@ pub async fn delete_user_record_store(
         return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }
 
-    println!("DELETE: removed record_store_id '{}' from user_id: {}", body.record_store_id,  user_id);
+    println!(
+        "DELETE: removed record_store_id '{}' from user_id: {}",
+        body.record_store_id, user_id
+    );
     Ok(StatusCode::NO_CONTENT)
 }
