@@ -1,7 +1,6 @@
 use chrono::{DateTime, Utc};
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
 
 /// for pagination in a front end UI
 #[derive(Deserialize, Debug, Default)]
@@ -10,18 +9,15 @@ pub struct FilterOptions {
     pub limit: Option<usize>,
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PutUserRecord {
-    pub record_id: Uuid
+    pub record_id: Uuid,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PatchUserRecord {
-    pub record_id: Uuid
+    pub record_id: Uuid,
 }
-
-
 
 // due to security concerns
 #[derive(Serialize, Deserialize, Debug)]
@@ -52,8 +48,8 @@ pub struct UpdateUserSchema {
     pub user_password: Option<String>,
 }
 
-// helps for converting to the appropriate exposed 
-// API GET Endpoints leveraging the From trait 
+// helps for converting to the appropriate exposed
+// API GET Endpoints leveraging the From trait
 impl From<UserModel> for UserResponseSchema {
     fn from(user: UserModel) -> Self {
         UserResponseSchema {

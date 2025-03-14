@@ -1,14 +1,14 @@
 use axum::{response::IntoResponse, Json};
-use sqlx::{postgres::PgPoolOptions, PgPool, Postgres, Pool};
 use dotenv::dotenv;
+use sqlx::{postgres::PgPoolOptions, PgPool, Pool, Postgres};
 use std::env;
 use std::error::Error;
 use std::sync::Arc;
 
 // import routes module
-mod routes;
-mod models;
 mod handlers;
+mod models;
+mod routes;
 
 pub struct AppState {
     db: Pool<Postgres>,
@@ -29,7 +29,7 @@ async fn connect_to_database() -> Result<PgPool, Box<dyn Error>> {
     dotenv().ok();
 
     let database_url = env::var("DATABASE_URL").expect("ERROR: DATABASE_URL must be set");
-    
+
     let pool = PgPoolOptions::new()
         .max_connections(10)
         .connect(&database_url)
@@ -42,13 +42,12 @@ async fn connect_to_database() -> Result<PgPool, Box<dyn Error>> {
 // Basics of using AXUM with PostgreSQL
 #[tokio::main]
 async fn main() {
-    
     match connect_to_database().await {
         Ok(pool) => {
             let app_state = Arc::new(AppState { db: pool.clone() });
             // create the app
             let app = routes::create_router(app_state);
-            
+
             println!("🛸 Server started successfully");
 
             let listener = tokio::net::TcpListener::bind("0.0.0.0:8000").await.unwrap();

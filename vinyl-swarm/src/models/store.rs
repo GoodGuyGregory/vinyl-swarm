@@ -1,6 +1,5 @@
-use serde::{Serialize, Deserialize};
+use serde::{Deserialize, Serialize};
 use uuid::Uuid;
-
 
 /// for pagination in a front end UI
 #[derive(Deserialize, Debug, Default)]
@@ -25,12 +24,10 @@ pub struct PutRecordStoreSchema {
     pub record_store_id: Uuid,
 }
 
-
 #[derive(Serialize, Deserialize, Debug)]
 pub struct PatchRecordStoreSchema {
     pub record_store_id: Uuid,
 }
-
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct UpdateRecordStoreSchema {
