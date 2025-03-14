@@ -101,6 +101,8 @@ pub async fn create_record_store(
                 "record_store": created_record_store
             });
 
+            println!("POST: created {} record store ", created_record_store.store_name);
+
             return Ok((StatusCode::CREATED, Json(record_store_response)));
         }
         Err(e) => {
@@ -133,6 +135,8 @@ pub async fn find_record_store(
                     "status": "success",
                     "record_store": record_store
                 });
+
+            println!("GET: returning {} record store", record_store.store_name);
     
             return Ok(Json(record_store_resp));
         }
@@ -198,6 +202,8 @@ pub async fn edit_record_store(
                     "status": "success",
                     "record_store": record_store
                 });
+            
+            println!("PATCH: editing {} store details", record_store.store_name);
 
             return  Ok((StatusCode::OK, Json(record_store_response)));
         }
@@ -295,7 +301,7 @@ pub async fn get_user_record_stores(
                 "results": record_stores.len(),
                 "user_record_stores": record_stores,
             });
-            println!("GET: user_record_stores for user_id: {}", user_id);
+            println!("GET: returning user_id: {} saved record stores", user_id);
             return Ok(Json(user_record_stores_response).into_response());
         }
         Err(_) => {
