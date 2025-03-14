@@ -1,17 +1,22 @@
 use std::sync::Arc;
 
+use axum::{
+    extract::{Path, Query, State},
+    http::StatusCode,
+    response::IntoResponse,
+    Json,
+};
 use bigdecimal::BigDecimal;
 use uuid::Uuid;
-use axum::{ 
-    extract::{Path, Query, State}, http::StatusCode, response::IntoResponse, Json
-};
 
 use serde_json::json;
 
 use crate::{
-    models::{record::{CreateRecordSchema, FilterOptions, RecordModel, UpdateRecordSchema}, 
-    user::{PutUserRecord, PatchUserRecord, UserModel}},
-    AppState
+    models::{
+        record::{CreateRecordSchema, FilterOptions, RecordModel, UpdateRecordSchema},
+        user::{PatchUserRecord, PutUserRecord, UserModel},
+    },
+    AppState,
 };
 
 /// GET all records from the database
@@ -28,7 +33,8 @@ pub async fn list_all_records(
         "SELECT * FROM records ORDER BY artist LIMIT $1 OFFSET $2",
         limit as i32,
         offset as i32
-    ).fetch_all(&data.db)
+    )
+    .fetch_all(&data.db)
     .await;
 
     match query_result {
@@ -51,20 +57,20 @@ pub async fn list_all_records(
             (StatusCode::INTERNAL_SERVER_ERROR, Json(error_response))
         }
     }
-
 }
 
 pub async fn find_record(
     Path(id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
-) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> 
-{
-
+) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
     // get the record assuming the provided Id is valid
     let query_result = sqlx::query_as!(
-        RecordModel, "SELECT * FROM records WHERE record_id = $1", id)
-        .fetch_one(&data.db)
-        .await;
+        RecordModel,
+        "SELECT * FROM records WHERE record_id = $1",
+        id
+    )
+    .fetch_one(&data.db)
+    .await;
 
     // match the potential error from the Result
     match query_result {
@@ -75,22 +81,24 @@ pub async fn find_record(
                 "record": record
             });
 
-            println!("GET: returning record {} by {} ", record.title, record.artist);
+            println!(
+                "GET: returning record {} by {} ",
+                record.title, record.artist
+            );
 
             return Ok(Json(record_response));
         }
         Err(_) => {
             let error_response = serde_json::json!(
-                {
-                    "status": "fail",
-                    "message": format!("record_id {} not found", id)
-                });
-            
+            {
+                "status": "fail",
+                "message": format!("record_id {} not found", id)
+            });
+
             return Err((StatusCode::NOT_FOUND, Json(error_response)));
         }
     }
 }
-
 
 /// edit_record
 /// deref leaves the original values in place as needed for options and passes the values
@@ -98,23 +106,24 @@ pub async fn find_record(
 pub async fn edit_record(
     Path(id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
-    Json(body): Json<UpdateRecordSchema>
+    Json(body): Json<UpdateRecordSchema>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    
     let query_result = sqlx::query_as!(
         RecordModel,
-        "SELECT * FROM records WHERE record_id = $1", id)
-        .fetch_one(&data.db)
-        .await;
-    
+        "SELECT * FROM records WHERE record_id = $1",
+        id
+    )
+    .fetch_one(&data.db)
+    .await;
+
     if query_result.is_err() {
         let error_response = serde_json::json!(
-            {
-                "status": "fail",
-                "message": format!("record id: {} not found", id)
-            });
+        {
+            "status": "fail",
+            "message": format!("record id: {} not found", id)
+        });
 
-            return  Err((StatusCode::NOT_FOUND, Json(error_response)));
+        return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }
 
     let record = query_result.unwrap();
@@ -130,7 +139,7 @@ pub async fn edit_record(
             body.released.to_owned().unwrap_or(record.released),
             &combine_supplied_genres(body.genre),
             body.format.as_deref().unwrap_or(record.format.as_deref().unwrap_or("LP")),
-            body.price.unwrap_or(record.price.unwrap_or(BigDecimal::from(0))),  
+            body.price.unwrap_or(record.price.unwrap_or(BigDecimal::from(0))),
             body.label.unwrap_or(record.label),
             body.duration_length.unwrap_or(record.duration_length),
             id,
@@ -142,23 +151,23 @@ pub async fn edit_record(
         // no errors -> respond with the record store
         Ok(record) => {
             let record_response = serde_json::json!(
-                {
-                    "status": "success",
-                    "record": record
-                });
+            {
+                "status": "success",
+                "record": record
+            });
 
             println!("PATCH: edited {} by {}", record.title, record.artist);
 
-            return  Ok((StatusCode::OK, Json(record_response)));
+            return Ok((StatusCode::OK, Json(record_response)));
         }
 
         Err(err) => {
-            return Err((StatusCode::INTERNAL_SERVER_ERROR,
-            Json(json!({"status": "error", "message": format!("{:?}", err)})),
+            return Err((
+                StatusCode::INTERNAL_SERVER_ERROR,
+                Json(json!({"status": "error", "message": format!("{:?}", err)})),
             ));
         }
     }
-
 }
 
 /// combine_supplied_genres:
@@ -166,8 +175,7 @@ pub async fn edit_record(
 /// or supplies and empty string vec if it fails
 /// join supplies the commas for PostgreSQL Array
 pub fn combine_supplied_genres(record_genres: Option<Vec<String>>) -> Vec<String> {
-    record_genres
-        .unwrap_or_else(|| vec![])  
+    record_genres.unwrap_or_else(|| vec![])
 }
 
 /// POST add another record:
@@ -176,9 +184,8 @@ pub fn combine_supplied_genres(record_genres: Option<Vec<String>>) -> Vec<String
 /// params: user_id, body: contains record struct
 pub async fn create_new_record(
     State(data): State<Arc<AppState>>,
-    Json(body): Json<CreateRecordSchema>
+    Json(body): Json<CreateRecordSchema>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-
     // query for the new record insertion
     let query_result = sqlx::query_as!(
         RecordModel,
@@ -206,19 +213,23 @@ pub async fn create_new_record(
                     "record": created_record
                 }
             );
-            println!("POST: created record: {} by {}", created_record.title, created_record.artist);
+            println!(
+                "POST: created record: {} by {}",
+                created_record.title, created_record.artist
+            );
 
-            return Ok((StatusCode::CREATED, Json(record_response)))
+            return Ok((StatusCode::CREATED, Json(record_response)));
         }
 
         Err(_) => {
             return Err((
                 StatusCode::CONFLICT,
-                Json(json!({"status": "error", "message": format!("record {} by {} already exists", body.title, body.artist)}))
+                Json(
+                    json!({"status": "error", "message": format!("record {} by {} already exists", body.title, body.artist)}),
+                ),
             ));
         }
     }
-
 }
 
 // DELETE specific record by id
@@ -226,7 +237,6 @@ pub async fn delete_record_by_id(
     Path(id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-
     let delete_query = sqlx::query!("DELETE FROM records WHERE record_id = $1", id)
         .execute(&data.db)
         .await
@@ -246,23 +256,26 @@ pub async fn delete_record_by_id(
     // assume it successfully deleted the record_store requested
     println!("DELETE: removed record_id {}", id);
     Ok(StatusCode::NO_CONTENT)
-} 
+}
 
 // WISHLIST ENDPOINTS:
 
 pub async fn get_users_wishlist(
     Path(user_id): Path<Uuid>,
-    State(data): State<Arc<AppState>>
+    State(data): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
     // query the db
-    let user_wishlist_query: Vec<Uuid> = sqlx::query!("SELECT record_id FROM user_wishlist WHERE user_id = $1", user_id)
-        .fetch_all(&data.db)
-        .await
-        .unwrap()
-        //iterate over the returned record ids
-        .into_iter()
-        .map(|row| row.record_id)
-        .collect();
+    let user_wishlist_query: Vec<Uuid> = sqlx::query!(
+        "SELECT record_id FROM user_wishlist WHERE user_id = $1",
+        user_id
+    )
+    .fetch_all(&data.db)
+    .await
+    .unwrap()
+    //iterate over the returned record ids
+    .into_iter()
+    .map(|row| row.record_id)
+    .collect();
 
     // show something to to client
     // basically there are no wishlist records.
@@ -278,12 +291,12 @@ pub async fn get_users_wishlist(
 
     // query for tunes users dream of owning on vinyl
     let record_query = sqlx::query_as!(
-            RecordModel,
-            "SELECT * FROM records WHERE record_id = ANY($1)",
-            &user_wishlist_query,
-        )
-        .fetch_all(&data.db)
-        .await;
+        RecordModel,
+        "SELECT * FROM records WHERE record_id = ANY($1)",
+        &user_wishlist_query,
+    )
+    .fetch_all(&data.db)
+    .await;
 
     match record_query {
         Ok(wishlist_records) => {
@@ -292,7 +305,11 @@ pub async fn get_users_wishlist(
                 "results": wishlist_records.len(),
                 "user_wishlist_records": wishlist_records,
             });
-            println!("GET: returning {} wishlist records for user_id: {}", wishlist_records.len(), user_id);
+            println!(
+                "GET: returning {} wishlist records for user_id: {}",
+                wishlist_records.len(),
+                user_id
+            );
             return Ok(Json(user_wishlist_response).into_response());
         }
         Err(_) => {
@@ -309,19 +326,15 @@ pub async fn get_users_wishlist(
 pub async fn add_to_user_wishlist(
     Path(user_id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
-    Json(body): Json<CreateRecordSchema>
+    Json(body): Json<CreateRecordSchema>,
 ) -> impl IntoResponse {
+    //query for the user if they even exist...
+    let user_query_check =
+        sqlx::query_as!(UserModel, "SELECT * FROM users WHERE user_id = $1", user_id)
+            .fetch_one(&data.db)
+            .await;
 
-     //query for the user if they even exist...
-    let user_query_check = sqlx::query_as!(
-        UserModel,
-        "SELECT * FROM users WHERE user_id = $1",
-        user_id
-    )
-    .fetch_one(&data.db)
-    .await;
-
-    // ensure the user exists 
+    // ensure the user exists
     match user_query_check {
         // yay! found a user! let's add some sweet music
         Ok(found_user) => {
@@ -366,9 +379,14 @@ pub async fn add_to_user_wishlist(
                                 "user_record_id": created_wish_list_record.record_id,
                                 "record": created_record,
                             });
-                            println!("POST: added '{}' by '{}' to user_id: {} wish list ", created_record.title, created_record.artist, created_wish_list_record.user_id);
+                            println!(
+                                "POST: added '{}' by '{}' to user_id: {} wish list ",
+                                created_record.title,
+                                created_record.artist,
+                                created_wish_list_record.user_id
+                            );
                             (StatusCode::OK, Json(created_wishlist_response))
-                        },
+                        }
                         Err(e) => {
                             let error_response = serde_json::json!({
                                 "status": "fail",
@@ -379,55 +397,55 @@ pub async fn add_to_user_wishlist(
                     }
                 }
                 // Error finding user or something went wrong
-                Err(_) => {
-                    (StatusCode::CONFLICT, Json(json!({"status": "error", "message": format!("record {:?} by {} already exists", body.title, body.artist)})))
-                }
+                Err(_) => (
+                    StatusCode::CONFLICT,
+                    Json(
+                        json!({"status": "error", "message": format!("record {:?} by {} already exists", body.title, body.artist)}),
+                    ),
+                ),
             }
         }
         // assume not an valid uuid
         Err(_) => {
             let error_response = serde_json::json!(
-                {
-                    "status": "fail",
-                    "message": format!("user_id {} not found", user_id)
-                });
-            
+            {
+                "status": "fail",
+                "message": format!("user_id {} not found", user_id)
+            });
+
             return (StatusCode::NOT_FOUND, Json(error_response));
         }
     }
 }
-
 
 pub async fn put_wishlist_record(
     Path(user_id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
     Json(body): Json<PutUserRecord>,
 ) -> impl IntoResponse {
-    
     //query for the user if they even exist...
-    let user_query_check = sqlx::query_as!(
-        UserModel,
-        "SELECT * FROM users WHERE user_id = $1",
-        user_id
-    )
-    .fetch_one(&data.db)
-    .await;
+    let user_query_check =
+        sqlx::query_as!(UserModel, "SELECT * FROM users WHERE user_id = $1", user_id)
+            .fetch_one(&data.db)
+            .await;
 
     // check for the existing record on the wishlist
     if let Ok(Some(_)) = sqlx::query!(
         "SELECT * FROM user_wishlist WHERE record_id = $1",
         body.record_id
-    ).fetch_optional(&data.db).await {
+    )
+    .fetch_optional(&data.db)
+    .await
+    {
         let error_response = serde_json::json!({
             "status": "fail",
             "message": format!("record_id: {} already in user wishlist", body.record_id ),
         });
-        
-        return (StatusCode::CONFLICT, Json(error_response));
 
+        return (StatusCode::CONFLICT, Json(error_response));
     }
 
-    // ensure the user exists 
+    // ensure the user exists
     match user_query_check {
         // yay! found a user! let's add some sweet music
         Ok(found_user) => {
@@ -464,10 +482,15 @@ pub async fn put_wishlist_record(
                                 "record": wished_record,
                             });
 
-                            println!("PUT: record {} by {} to user_id: {} wishlist", wished_record.title, wished_record.artist, wished_user_record.user_id);
+                            println!(
+                                "PUT: record {} by {} to user_id: {} wishlist",
+                                wished_record.title,
+                                wished_record.artist,
+                                wished_user_record.user_id
+                            );
 
                             (StatusCode::OK, Json(user_wished_created_response))
-                        },
+                        }
                         Err(e) => {
                             let error_response = serde_json::json!({
                                 "status": "fail",
@@ -477,23 +500,25 @@ pub async fn put_wishlist_record(
                         }
                     }
                 }
-                Err(_) => {
-                    (StatusCode::NOT_FOUND, Json(json!({"status": "error", "message": format!("record_id: {} not found", body.record_id)})))
-                }
+                Err(_) => (
+                    StatusCode::NOT_FOUND,
+                    Json(
+                        json!({"status": "error", "message": format!("record_id: {} not found", body.record_id)}),
+                    ),
+                ),
             }
         }
         // assume not an valid uuid
         Err(_) => {
             let error_response = serde_json::json!(
-                {
-                    "status": "fail",
-                    "message": format!("record {} not found", body.record_id)
-                });
-            
+            {
+                "status": "fail",
+                "message": format!("record {} not found", body.record_id)
+            });
+
             return (StatusCode::NOT_FOUND, Json(error_response));
         }
     }
-
 }
 
 // DELETE a specific record from the wishlist
@@ -502,10 +527,7 @@ pub async fn remove_wishlist_record(
     State(data): State<Arc<AppState>>,
     Json(body): Json<PatchUserRecord>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-
-    let check_user_query = sqlx::query!(
-        "SELECT user_id FROM users WHERE user_id = $1",
-        user_id)
+    let check_user_query = sqlx::query!("SELECT user_id FROM users WHERE user_id = $1", user_id)
         .fetch_optional(&data.db)
         .await
         .unwrap();
@@ -540,18 +562,19 @@ pub async fn remove_wishlist_record(
         return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }
 
-    println!("DELETE: successfully removed {} from user wishlist", body.record_id);
+    println!(
+        "DELETE: successfully removed {} from user wishlist",
+        body.record_id
+    );
     Ok(StatusCode::NO_CONTENT)
-
 }
-
 
 pub async fn remove_user_wishlist(
     Path(user_id): Path<Uuid>,
-    State(data): State<Arc<AppState>>
+    State(data): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
     println!("🚮 removing user's records wishlist");
-    
+
     // checking for the user id. cause, something has to be done with an actual person
     let rows_affected = sqlx::query!("DELETE FROM user_wishlist WHERE user_id = $1", user_id)
         .execute(&data.db)
@@ -568,5 +591,5 @@ pub async fn remove_user_wishlist(
     }
 
     println!("user: {} user_wishlist cleared", user_id);
-    Ok(StatusCode::NO_CONTENT) 
+    Ok(StatusCode::NO_CONTENT)
 }
