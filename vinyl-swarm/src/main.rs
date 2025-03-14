@@ -8,6 +8,7 @@ use std::sync::Arc;
 // import routes module
 mod routes;
 mod models;
+mod handlers;
 
 pub struct AppState {
     db: Pool<Postgres>,
