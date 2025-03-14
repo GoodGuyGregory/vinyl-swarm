@@ -22,7 +22,7 @@ use crate::{
         RecordModel,
         CreateRecordSchema,
     },
-    routes::records::combine_supplied_genres,
+    handlers::records::combine_supplied_genres,
 };
 
 pub async fn list_all_users(

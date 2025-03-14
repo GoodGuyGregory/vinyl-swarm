@@ -40,6 +40,7 @@ pub async fn list_all_records(
                 "results": records.len(),
                 "records": records,
             });
+            println!("GET: returning all records");
             (StatusCode::OK, Json(json_response))
         }
         Err(_) => {
@@ -73,6 +74,8 @@ pub async fn find_record(
                 "status": "success",
                 "record": record
             });
+
+            println!("GET: returning record {} by {} ", record.title, record.artist);
 
             return Ok(Json(record_response));
         }
@@ -201,6 +204,7 @@ pub async fn create_new_record(
                     "record": created_record
                 }
             );
+            println!("POST: created record: {} by {}", created_record.title, created_record.artist);
 
             return Ok((StatusCode::CREATED, Json(record_response)))
         }

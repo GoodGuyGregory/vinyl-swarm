@@ -10,16 +10,17 @@ use axum::{
 // internal modules 
 use crate::{
     AppState,
-    routes::records::{
+    
+    handlers::records::{
         // wishlists:
         get_users_wishlist, add_to_user_wishlist, put_wishlist_record, remove_wishlist_record, remove_user_wishlist,
         list_all_records, find_record, create_new_record, edit_record, delete_record_by_id
     },
-    routes::record_stores::{
+    handlers::record_stores::{
         // user_record_stores:
         get_user_record_stores, add_existing_record_store, add_user_record_store, delete_user_record_store,
         list_all_stores, create_record_store, edit_record_store, find_record_store, delete_record_store},
-    routes::users::{
+    handlers::users::{
         list_all_users, find_specific_user, create_user, edit_user, delete_user, 
         get_user_records, create_user_record, put_user_record, remove_user_record, remove_all_user_records},
 };

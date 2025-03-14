@@ -42,6 +42,7 @@ pub async fn list_all_stores(
                 "results": record_stores.len(),
                 "record_stores": record_stores,
             });
+            println!("GET: returning all record_stores");
             (StatusCode::OK, Json(json_response))
         }
         Err(_) => {
@@ -232,6 +233,7 @@ pub async fn delete_record_store(
     }
 
     // assume it successfully deleted the record_store requested
+    println!("DELETE: removed record_store: {}", id);
     Ok(StatusCode::NO_CONTENT)
 } 
 
@@ -240,7 +242,6 @@ pub async fn get_user_record_stores(
     Path(user_id): Path<Uuid>,
     State(data): State<Arc<AppState>>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    println!("🛍️  GET: user_record_stores");
 
 
     // check for the user.
@@ -294,6 +295,7 @@ pub async fn get_user_record_stores(
                 "results": record_stores.len(),
                 "user_record_stores": record_stores,
             });
+            println!("GET: user_record_stores for user_id: {}", user_id);
             return Ok(Json(user_record_stores_response).into_response());
         }
         Err(_) => {
@@ -315,7 +317,7 @@ pub async fn add_existing_record_store(
     State(data): State<Arc<AppState>>,
     Json(body): Json<PutRecordStoreSchema>
 ) -> impl IntoResponse {
-    println!("🚲 Adding new user record store");
+
 
     //query for the user if they even exist...
     let user_query_check = sqlx::query_as!(
@@ -361,6 +363,7 @@ pub async fn add_existing_record_store(
                                 "user_favorite_stores_id": user_record_store.user_favorite_stores_id,
                                 "record_store": existing_record_store,
                             });
+                            println!("PUT: adding record_store '{}' to user_id: {} ", existing_record_store.store_name, user_id);
 
                             (StatusCode::OK, Json(user_wished_created_response))
                         },
@@ -397,7 +400,6 @@ pub  async fn add_user_record_store(
     State(data): State<Arc<AppState>>,
     Json(body): Json<CreateRecordStoreSchema>
 ) -> impl IntoResponse {
-    println!("🚲 Adding new user record store");
 
     //query for the user if they even exist...
     let user_query_check = sqlx::query_as!(
@@ -449,6 +451,7 @@ pub  async fn add_user_record_store(
                                 "user_record_store_id": inserted_user_store.record_store_id,
                                 "record": created_record_store,
                             });
+                            println!("POST: adding new record_store: '{}' to user_id: {} collection.", created_record_store.store_name, user_id);
                             (StatusCode::OK, Json(created_store_response))
                         },
                         Err(e) => {
@@ -485,7 +488,7 @@ pub async fn delete_user_record_store(
     State(data): State<Arc<AppState>>,
     Json(body): Json<PatchRecordStoreSchema>,
 ) -> Result<impl IntoResponse, (StatusCode, Json<serde_json::Value>)> {
-    println!("🚮 removing record store");
+    
 
     let check_user_query = sqlx::query!(
         "SELECT user_id FROM users WHERE user_id = $1",
@@ -524,5 +527,6 @@ pub async fn delete_user_record_store(
         return Err((StatusCode::NOT_FOUND, Json(error_response)));
     }
 
+    println!("DELETE: removed record_store_id '{}' from user_id: {}", body.record_store_id,  user_id);
     Ok(StatusCode::NO_CONTENT)
 }
