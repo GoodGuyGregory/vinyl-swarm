@@ -32,6 +32,7 @@ pub async fn status_handler() -> impl IntoResponse {
         "status": "ok",
         "message": message_status
     });
+    println!("Server Status: OK");
 
     Json(json_response)
 }
