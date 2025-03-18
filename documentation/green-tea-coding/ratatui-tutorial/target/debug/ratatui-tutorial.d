@@ -1,1 +1,0 @@
-/Users/gregwitt/Github/vinyl-swarm/documentation/green-tea-coding/ratatui-tutorial/target/debug/ratatui-tutorial: /Users/gregwitt/Github/vinyl-swarm/documentation/green-tea-coding/ratatui-tutorial/src/main.rs

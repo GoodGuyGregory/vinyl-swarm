@@ -1,1 +1,0 @@
-/Users/gregwitt/Github/vinyl-swarm/documentation/sqlx/bookstore/target/debug/bookstore: /Users/gregwitt/Github/vinyl-swarm/documentation/sqlx/bookstore/migrations/0001_books_table.sql /Users/gregwitt/Github/vinyl-swarm/documentation/sqlx/bookstore/migrations/0002_authors_table.sql /Users/gregwitt/Github/vinyl-swarm/documentation/sqlx/bookstore/src/main.rs
