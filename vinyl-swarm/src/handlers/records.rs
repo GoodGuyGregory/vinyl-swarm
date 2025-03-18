@@ -449,7 +449,7 @@ pub async fn put_wishlist_record(
     match user_query_check {
         // yay! found a user! let's add some sweet music
         Ok(found_user) => {
-            println!("SELECTING Record id:");
+            println!("SELECTING Record id: {}", body.record_id);
             // query for the existing record
             let query_record_result = sqlx::query_as!(
                 RecordModel,
