@@ -150,6 +150,33 @@ cargo run
 [Vinyl Swarm API](https://documenter.getpostman.com/view/5839344/2sAYk7SizX) click the `Run in Postman` button if you're not familiar with `Curl Commands`
 
 
+## Documentation
+
+#### Axum 
+
+[Axum](https://docs.rs/axum/latest/axum/)
+
+[Getting Started With Axum](https://codevoweb.com/rust-crud-api-example-with-axum-and-postgresql/)
+
+#### Migrations with SQLX
+
+[SQLX](https://docs.rs/sqlx/latest/sqlx/)
+
+[SQLX Basics](https://www.youtube.com/watch?v=TCERYbgvbq0&t=32s)
+
+#### Serde
+
+[Serde](https://docs.rs/serde/latest/serde/)
+
+#### Reqwest
+
+[Making Reqwests with Rust](https://blog.logrocket.com/making-http-requests-rust-reqwest/)
+
+#### Tokio 
+
+[Tokio](https://tokio.rs/tokio/tutorial)
+
+
 
 ## Contact
 
