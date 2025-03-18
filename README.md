@@ -145,12 +145,12 @@ from the terminal start up the application, but ensure the current working direc
 cargo run   
 ```
 
-**Open API Documentation**
+## Documentation
+
+#### Vinyl-Swarm Open API Documentation 
 
 [Vinyl Swarm API](https://documenter.getpostman.com/view/5839344/2sAYk7SizX) click the `Run in Postman` button if you're not familiar with `Curl Commands`
 
-
-## Documentation
 
 #### Axum 
 
