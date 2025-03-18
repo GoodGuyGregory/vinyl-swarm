@@ -151,7 +151,6 @@ cargo run
 
 [Vinyl Swarm API](https://documenter.getpostman.com/view/5839344/2sAYk7SizX) click the `Run in Postman` button if you're not familiar with `Curl Commands`
 
-
 #### Axum 
 
 [Axum](https://docs.rs/axum/latest/axum/)
