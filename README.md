@@ -145,6 +145,10 @@ from the terminal start up the application, but ensure the current working direc
 cargo run   
 ```
 
+## Challenges
+
+at first learning the style of module support for Rust was difficult. I often placed directories and modules in the wrong location or forgot to bring them inside of the project file that explicitly needed them. the Rust compiler was sharp and eager to tell me of my failed imports which made error tracking much easier to solve. I grew more fond of the structure as I progressed building the application breaking down functionality between files to separate component concerns for each model. **User**, **Records**, **RecordStores**. Then adding unique routes and handlers for these models to interact with the database and properly influence the user backend. After having students attempt to build the project I modified the wording and instructions. I also learned how to manage `git filter-repo` by reducing the size and removing documentation resources I used as references on how to start building a project of this scale in Axum and Rust. I hope you enjoy the concept and reach out to me if you have any questions or concerns.
+
 ## Documentation
 
 #### Vinyl-Swarm Open API Documentation 
