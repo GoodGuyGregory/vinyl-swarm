@@ -83,23 +83,21 @@ pub async fn find_specific_user(
 
             println!("GET: returning details for {}", converted_user.user_name);
 
-            return Ok(Json(user_response));
+            Ok(Json(user_response))
         }
         Err(_) => {
             let error_response = serde_json::json!({
                 "status": "fail",
                 "message": format!("user_id {} not found", id)
             });
-            return Err((StatusCode::NOT_FOUND, Json(error_response)));
+            Err((StatusCode::NOT_FOUND, Json(error_response)))
         }
     }
 }
 
 // helper function for the password hashing.
 fn create_hashed_password(password_text: String) -> String {
-    let hashed_password = hash(password_text, DEFAULT_COST).unwrap();
-
-    hashed_password
+    hash(password_text, DEFAULT_COST).unwrap()
 }
 
 pub async fn create_user(
@@ -129,7 +127,7 @@ pub async fn create_user(
 
             println!("POST: created user {}", converted_user.user_name);
 
-            return Ok((StatusCode::CREATED, Json(user_response)));
+            Ok((StatusCode::CREATED, Json(user_response)))
         }
         Err(e) => {
             if e.to_string()
@@ -145,10 +143,10 @@ pub async fn create_user(
             }
 
             // otherwise it's not a duplicate and something went wrong
-            return Err((
+            Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(json!({"status": "error", "message": format!("{:?}", e)})),
-            ));
+            ))
         }
     }
 }
@@ -202,14 +200,12 @@ pub async fn edit_user(
                 converted_user.user_name
             );
 
-            return Ok((StatusCode::OK, Json(user_response)));
+            Ok((StatusCode::OK, Json(user_response)))
         }
-        Err(err) => {
-            return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(json!({"status": "error", "message": format!("{:?}", err)})),
-            ));
-        }
+        Err(err) => Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"status": "error", "message": format!("{:?}", err)})),
+        )),
     }
 }
 
@@ -260,14 +256,14 @@ pub async fn get_user_records(
 
             println!("GET: returning user_id: {} records", user_id);
 
-            return Ok(Json(user_records_response).into_response());
+            Ok(Json(user_records_response).into_response())
         }
         Err(_) => {
             let error_response = json!({
                 "status": "fail",
                 "message": format!("no user_records found for user id: {}", user_id)
             });
-            return Err((StatusCode::NOT_FOUND, Json(error_response)));
+            Err((StatusCode::NOT_FOUND, Json(error_response)))
         }
     }
 }
@@ -369,7 +365,7 @@ pub async fn create_user_record(
                 "message": format!("user_id {} not found", user_id)
             });
 
-            return (StatusCode::NOT_FOUND, Json(error_response));
+            (StatusCode::NOT_FOUND, Json(error_response))
         }
     }
 }
@@ -474,7 +470,7 @@ pub async fn put_user_record(
                 "message": format!("user_id: {} not found", body.record_id)
             });
 
-            return (StatusCode::NOT_FOUND, Json(error_response));
+            (StatusCode::NOT_FOUND, Json(error_response))
         }
     }
 }

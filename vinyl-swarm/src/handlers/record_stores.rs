@@ -111,14 +111,14 @@ pub async fn create_record_store(
                 created_record_store.store_name
             );
 
-            return Ok((StatusCode::CREATED, Json(record_store_response)));
+            Ok((StatusCode::CREATED, Json(record_store_response)))
         }
         Err(e) => {
             // otherwise it's not a duplicate and something went wrong
-            return Err((
+            Err((
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(json!({"status": "error", "message": format!("{:?}", e)})),
-            ));
+            ))
         }
     }
 }
@@ -147,7 +147,7 @@ pub async fn find_record_store(
 
             println!("GET: returning {} record store", record_store.store_name);
 
-            return Ok(Json(record_store_resp));
+            Ok(Json(record_store_resp))
         }
         Err(_) => {
             let error_response = serde_json::json!(
@@ -156,7 +156,7 @@ pub async fn find_record_store(
                 "message": format!("record_store_id {} not found", id)
             });
 
-            return Err((StatusCode::NOT_FOUND, Json(error_response)));
+            Err((StatusCode::NOT_FOUND, Json(error_response)))
         }
     }
 }
@@ -215,15 +215,13 @@ pub async fn edit_record_store(
 
             println!("PATCH: editing {} store details", record_store.store_name);
 
-            return Ok((StatusCode::OK, Json(record_store_response)));
+            Ok((StatusCode::OK, Json(record_store_response)))
         }
 
-        Err(err) => {
-            return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(json!({"status": "error", "message": format!("{:?}", err)})),
-            ));
-        }
+        Err(err) => Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"status": "error", "message": format!("{:?}", err)})),
+        )),
     }
 }
 
@@ -310,14 +308,14 @@ pub async fn get_user_record_stores(
                 "user_record_stores": record_stores,
             });
             println!("GET: returning user_id: {} saved record stores", user_id);
-            return Ok(Json(user_record_stores_response).into_response());
+            Ok(Json(user_record_stores_response).into_response())
         }
         Err(_) => {
             let error_response = json!({
                 "status": "fail",
                 "message": format!("no user_records found for user id: {}", user_id)
             });
-            return Err((StatusCode::NOT_FOUND, Json(error_response)));
+            Err((StatusCode::NOT_FOUND, Json(error_response)))
         }
     }
 
@@ -401,7 +399,7 @@ pub async fn add_existing_record_store(
                 "message": format!("record_store {} not found", body.record_store_id)
             });
 
-            return (StatusCode::NOT_FOUND, Json(error_response));
+            (StatusCode::NOT_FOUND, Json(error_response))
         }
     }
 }
@@ -488,7 +486,7 @@ pub async fn add_user_record_store(
                 "message": format!("user_id {} not found", user_id)
             });
 
-            return (StatusCode::NOT_FOUND, Json(error_response));
+            (StatusCode::NOT_FOUND, Json(error_response))
         }
     }
 }

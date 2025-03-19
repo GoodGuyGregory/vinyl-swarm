@@ -86,7 +86,7 @@ pub async fn find_record(
                 record.title, record.artist
             );
 
-            return Ok(Json(record_response));
+            Ok(Json(record_response))
         }
         Err(_) => {
             let error_response = serde_json::json!(
@@ -95,7 +95,7 @@ pub async fn find_record(
                 "message": format!("record_id {} not found", id)
             });
 
-            return Err((StatusCode::NOT_FOUND, Json(error_response)));
+            Err((StatusCode::NOT_FOUND, Json(error_response)))
         }
     }
 }
@@ -158,15 +158,13 @@ pub async fn edit_record(
 
             println!("PATCH: edited {} by {}", record.title, record.artist);
 
-            return Ok((StatusCode::OK, Json(record_response)));
+            Ok((StatusCode::OK, Json(record_response)))
         }
 
-        Err(err) => {
-            return Err((
-                StatusCode::INTERNAL_SERVER_ERROR,
-                Json(json!({"status": "error", "message": format!("{:?}", err)})),
-            ));
-        }
+        Err(err) => Err((
+            StatusCode::INTERNAL_SERVER_ERROR,
+            Json(json!({"status": "error", "message": format!("{:?}", err)})),
+        )),
     }
 }
 
@@ -175,7 +173,7 @@ pub async fn edit_record(
 /// or supplies and empty string vec if it fails
 /// join supplies the commas for PostgreSQL Array
 pub fn combine_supplied_genres(record_genres: Option<Vec<String>>) -> Vec<String> {
-    record_genres.unwrap_or_else(|| vec![])
+    record_genres.unwrap_or_default()
 }
 
 /// POST add another record:
@@ -218,17 +216,15 @@ pub async fn create_new_record(
                 created_record.title, created_record.artist
             );
 
-            return Ok((StatusCode::CREATED, Json(record_response)));
+            Ok((StatusCode::CREATED, Json(record_response)))
         }
 
-        Err(_) => {
-            return Err((
-                StatusCode::CONFLICT,
-                Json(
-                    json!({"status": "error", "message": format!("record {} by {} already exists", body.title, body.artist)}),
-                ),
-            ));
-        }
+        Err(_) => Err((
+            StatusCode::CONFLICT,
+            Json(
+                json!({"status": "error", "message": format!("record {} by {} already exists", body.title, body.artist)}),
+            ),
+        )),
     }
 }
 
@@ -310,14 +306,14 @@ pub async fn get_users_wishlist(
                 wishlist_records.len(),
                 user_id
             );
-            return Ok(Json(user_wishlist_response).into_response());
+            Ok(Json(user_wishlist_response).into_response())
         }
         Err(_) => {
             let error_response = json!({
                 "status": "fail",
                 "message": format!("no user_wishlist records found for user id: {}", user_id)
             });
-            return Err((StatusCode::NOT_FOUND, Json(error_response)));
+            Err((StatusCode::NOT_FOUND, Json(error_response)))
         }
     }
 }
@@ -413,7 +409,7 @@ pub async fn add_to_user_wishlist(
                 "message": format!("user_id {} not found", user_id)
             });
 
-            return (StatusCode::NOT_FOUND, Json(error_response));
+            (StatusCode::NOT_FOUND, Json(error_response))
         }
     }
 }
@@ -516,7 +512,7 @@ pub async fn put_wishlist_record(
                 "message": format!("record {} not found", body.record_id)
             });
 
-            return (StatusCode::NOT_FOUND, Json(error_response));
+            (StatusCode::NOT_FOUND, Json(error_response))
         }
     }
 }
