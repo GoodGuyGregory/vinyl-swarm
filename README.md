@@ -70,7 +70,7 @@ uuid = { version = "1.15.1", features = ["serde", "v4"] }
 
 ## Initialize Database
 
-After building the project you're ready to add the initial database files to start adding your personal collection. from inside the `vinyl-swarm` directory
+After building the project you're ready to add the initial database files to start adding your personal collection. from inside the `vinyl-swarm` directory. 
 
 **Create Database Configuration**
 
@@ -123,7 +123,7 @@ cargo install sqlx-cli
 
 **Run Initial Migration**
 
-once the `sqlx-cli` process is installed. ensure you're inside of the project code. 
+once the `sqlx-cli` process is installed. ensure you're inside of the project code. execute the following commands in the correct locations while your connected postgres instance is running. 
 
 
 ```bash
