@@ -70,15 +70,15 @@ uuid = { version = "1.15.1", features = ["serde", "v4"] }
 
 ## Initialize Database
 
-After building the project you're ready to add the initial database files to start adding your personal collection. 
+After building the project you're ready to add the initial database files to start adding your personal collection. from inside the `vinyl-swarm` directory
 
 **Create Database Configuration**
 
-point the project to your newly created database and supply the connection string inside of a `.env` file at the `root` of the project.
+point the project to your newly created database and supply the connection string inside of a `.env` file at the `root` of the project. *ie inside the `vinyl-swarm` directory of this repo*
 
 **Project Structure Below**
 
-place the  `.env` in the same location.
+place the `.env` in the same location. This is the Vinyl-Swarm Project contents.
 
 ```tree
 ├── Cargo.lock
