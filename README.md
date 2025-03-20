@@ -1,6 +1,6 @@
 # Vinyl Swarm
 
-Collecting vinyl is an adventure, but with so much out there, finding everything you want can be overwhelming. Another challenge? As your collection grows, so does the difficulty of keeping track—when you hit 100+ records, knowing what you own becomes a task in itself. I haven’t quite reached that number yet, but I know I will. That’s why I built this project. 
+Collecting vinyl is a journey, but with so much out there, finding everything you want can be overwhelming. It's challenging too! As your collection grows, so does the difficulty of keeping track of knowing what you want and already own. I want to collect as many vinyl treasures as possible, and reduce the stress of keeping track of all my records. I also got tired of lossing lists of records I plan on purchasing at a later time. That’s why I built this project. 
 
 On top of that, hunting for records isn't just about what you already own—it’s about discovering new places, supporting local merchants, and building a community of fellow collectors. With Vinyl Swarm, you can search for friends, share collections, and track down hidden gems together. Whether you’re digging through crates at your favorite shop or mapping out new stores to explore, this app makes it easier to connect, collect, and celebrate the vinyl experience.
 
