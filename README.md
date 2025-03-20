@@ -18,7 +18,8 @@ My hope is that this API makes finding vinyl-collecting friends easier, helps yo
 
 ## API Documentation
 
-[Vinyl Swarm API](https://documenter.getpostman.com/view/5839344/2sAYk7SizX) Keep in mind the documentation won't operate correctly unless the project is build and running. 
+[Vinyl Swarm API](https://documenter.getpostman.com/view/5839344/2sAYk7SizX) Keep in mind the documentation won't operate correctly unless the project is build and running. click the `Run in Postman` button if you're not familiar with `Curl Commands`
+
 
 ------  
 
@@ -150,10 +151,6 @@ cargo run
 at first learning the style of module support for Rust was difficult. I often placed directories and modules in the wrong location or forgot to bring them inside of the project file that explicitly needed them. the Rust compiler was sharp and eager to tell me of my failed imports which made error tracking much easier to solve. I grew more fond of the structure as I progressed building the application breaking down functionality between files to separate component concerns for each model. **User**, **Records**, **RecordStores**. Then adding unique routes and handlers for these models to interact with the database and properly influence the user backend. After having students attempt to build the project I modified the wording and instructions. I also learned how to manage `git filter-repo` by reducing the size and removing documentation resources I used as references on how to start building a project of this scale in Axum and Rust. I hope you enjoy the concept and reach out to me if you have any questions or concerns.
 
 ## Documentation
-
-#### Vinyl-Swarm Open API Documentation 
-
-[Vinyl Swarm API](https://documenter.getpostman.com/view/5839344/2sAYk7SizX) click the `Run in Postman` button if you're not familiar with `Curl Commands`
 
 #### Axum 
 
