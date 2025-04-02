@@ -254,6 +254,18 @@ pub async fn delete_record_by_id(
     Ok(StatusCode::NO_CONTENT)
 }
 
+// RECORD_COVER ENDPOINTS:
+
+// Record Cover handlers will be added here
+
+// get record covers by record_id
+
+// put update record covers by record id
+
+// post record covers
+
+
+
 // WISHLIST ENDPOINTS:
 
 pub async fn get_users_wishlist(
